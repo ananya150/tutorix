@@ -6,6 +6,11 @@ export class ShapeDescriptions extends TldrawAiTransform {
 			case 'createShape': {
 				const { shape, description } = change
 
+				// Only handle text shapes
+				if (shape.type !== 'text') {
+					return change
+				}
+
 				if (description) {
 					shape.meta = {
 						...shape.meta,
@@ -19,6 +24,11 @@ export class ShapeDescriptions extends TldrawAiTransform {
 			}
 			case 'updateShape': {
 				const { shape, description } = change
+
+				// Only handle text shapes
+				if (shape.type !== 'text') {
+					return change
+				}
 
 				if (description) {
 					shape.meta = {

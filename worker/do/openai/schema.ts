@@ -25,82 +25,17 @@ export type ISimpleFill = z.infer<typeof SimpleFill>
 
 const SimpleLabel = z.string()
 
-const SimpleRectangleShape = z.object({
-	type: z.literal('rectangle'),
-	shapeId: z.string(),
-	note: z.string(),
-	x: z.number(),
-	y: z.number(),
-	width: z.number(),
-	height: z.number(),
-	color: SimpleColor.optional(),
-	fill: SimpleFill.optional(),
-	text: SimpleLabel.optional(),
-})
-
-export type ISimpleRectangleShape = z.infer<typeof SimpleRectangleShape>
-
-const SimpleEllipseShape = z.object({
-	type: z.literal('ellipse'),
-	shapeId: z.string(),
-	note: z.string(),
-	x: z.number(),
-	y: z.number(),
-	width: z.number(),
-	height: z.number(),
-	color: SimpleColor.optional(),
-	fill: SimpleFill.optional(),
-	text: SimpleLabel.optional(),
-})
-
-export type ISimpleEllipseShape = z.infer<typeof SimpleEllipseShape>
-
-const SimpleCloudShape = z.object({
-	type: z.literal('cloud'),
-	shapeId: z.string(),
-	note: z.string(),
-	x: z.number(),
-	y: z.number(),
-	width: z.number(),
-	height: z.number(),
-	color: SimpleColor.optional(),
-	fill: SimpleFill.optional(),
-	text: SimpleLabel.optional(),
-})
-
-export type ISimpleCloudShape = z.infer<typeof SimpleCloudShape>
-
-const SimpleLineShape = z.object({
-	type: z.literal('line'),
-	shapeId: z.string(),
-	note: z.string(),
-	x1: z.number(),
-	y1: z.number(),
-	x2: z.number(),
-	y2: z.number(),
-	color: SimpleColor.optional(),
-})
-
-export type ISimpleLineShape = z.infer<typeof SimpleLineShape>
-
-const SimpleNoteShape = z.object({
-	type: z.literal('note'),
-	shapeId: z.string(),
-	note: z.string(),
-	x: z.number(),
-	y: z.number(),
-	color: SimpleColor.optional(),
-	text: SimpleLabel.optional(),
-})
-
-export type ISimpleNoteShape = z.infer<typeof SimpleNoteShape>
+// Removed rectangle, ellipse, cloud, line, and note shapes - we only support text now
 
 const SimpleTextShape = z.object({
 	type: z.literal('text'),
 	shapeId: z.string(),
 	note: z.string(),
-	x: z.number(),
-	y: z.number(),
+	// Grid-based positioning instead of coordinates
+	contentType: z.enum(['title', 'heading', 'subheading', 'definition', 'bullet', 'numbered', 'formula', 'note', 'example', 'summary']),
+	targetRow: z.number().optional(), // AI can suggest specific row, otherwise auto-assigned
+	columnSpan: z.array(z.number()).length(2).optional(), // [start, end] columns, otherwise auto from content type
+	// Keep text properties
 	color: SimpleColor.optional(),
 	text: z.string().optional(),
 	textAlign: z.enum(['start', 'middle', 'end']).optional(),
@@ -108,42 +43,8 @@ const SimpleTextShape = z.object({
 
 export type ISimpleTextShape = z.infer<typeof SimpleTextShape>
 
-const SimpleArrowShape = z.object({
-	type: z.literal('arrow'),
-	shapeId: z.string(),
-	note: z.string(),
-	fromId: z.string().nullable(),
-	toId: z.string().nullable(),
-	x1: z.number(),
-	y1: z.number(),
-	x2: z.number(),
-	y2: z.number(),
-	color: SimpleColor.optional(),
-	text: SimpleLabel.optional(),
-})
-
-export type ISimpleArrowShape = z.infer<typeof SimpleArrowShape>
-
-const SimpleUnknownShape = z.object({
-	type: z.literal('unknown'),
-	shapeId: z.string(),
-	note: z.string(),
-	x: z.number(),
-	y: z.number(),
-})
-
-export type ISimpleUnknownShape = z.infer<typeof SimpleUnknownShape>
-
-const SimpleShape = z.union([
-	SimpleUnknownShape,
-	SimpleRectangleShape,
-	SimpleEllipseShape,
-	SimpleCloudShape,
-	SimpleLineShape,
-	SimpleTextShape,
-	SimpleArrowShape,
-	SimpleNoteShape,
-])
+// Only support text shapes now
+const SimpleShape = SimpleTextShape
 
 export type ISimpleShape = z.infer<typeof SimpleShape>
 

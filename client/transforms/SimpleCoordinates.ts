@@ -11,8 +11,11 @@ export class SimpleCoordinates extends TldrawAiTransform {
 		// Save the original coordinates of context bounds (the user's viewport)
 		this.bounds = contextBounds.clone()
 
-		// Save the original coordinates of all shapes
+		// Save the original coordinates of all shapes (text only)
 		for (const s of canvasContent.shapes) {
+			// Only process text shapes
+			if (s.type !== 'text') continue
+
 			for (const prop of ['x', 'y'] as const) {
 				this.before[s.id + '_' + prop] = s[prop]
 				s[prop] = Math.floor(s[prop] - this.bounds[prop])
@@ -42,6 +45,12 @@ export class SimpleCoordinates extends TldrawAiTransform {
 			case 'createShape':
 			case 'updateShape': {
 				const { shape } = change
+				
+				// Only handle text shapes
+				if (shape.type !== 'text') {
+					return change
+				}
+
 				// Add back in the offset
 				for (const prop of ['x', 'y'] as const) {
 					if (shape[prop] !== undefined) {

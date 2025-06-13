@@ -16,12 +16,15 @@ export function getSimpleContentFromCanvasContent(content: TLAiContent): {
 	return {
 		shapes: compact(
 			content.shapes.map((shape) => {
+				// Only handle text shapes
 				if (shape.type === 'text') {
 					const s = shape as TLTextShape
+					// For simplicity, we'll convert richText to string by getting its text representation
+					const textContent = JSON.stringify(s.props.richText || '')
 					return {
 						shapeId: s.id,
 						type: 'text',
-						text: s.props.richText,
+						text: textContent,
 						x: s.x,
 						y: s.y,
 						color: s.props.color,
@@ -30,86 +33,8 @@ export function getSimpleContentFromCanvasContent(content: TLAiContent): {
 					}
 				}
 
-				if (shape.type === 'geo') {
-					const s = shape as TLGeoShape
-					if (s.props.geo === 'rectangle' || s.props.geo === 'ellipse' || s.props.geo === 'cloud') {
-						return {
-							shapeId: s.id,
-							type: s.props.geo,
-							x: s.x,
-							y: s.y,
-							width: s.props.w,
-							height: s.props.h,
-							color: s.props.color,
-							fill: shapeFillToSimpleFill(s.props.fill),
-							text: s.props.richText,
-							note: (s.meta?.description as string) ?? '',
-						}
-					}
-				}
-
-				if (shape.type === 'line') {
-					const s = shape as TLLineShape
-					const points = Object.values(s.props.points).sort((a, b) =>
-						a.index.localeCompare(b.index)
-					)
-					return {
-						shapeId: s.id,
-						type: 'line',
-						x1: points[0].x + s.x,
-						y1: points[0].y + s.y,
-						x2: points[1].x + s.x,
-						y2: points[1].y + s.y,
-						color: s.props.color,
-						note: (s.meta?.description as string) ?? '',
-					}
-				}
-
-				if (shape.type === 'arrow') {
-					const s = shape as TLArrowShape
-					const { bindings = [] } = content
-					const arrowBindings = bindings.filter(
-						(b) => b.type === 'arrow' && b.fromId === s.id
-					) as TLArrowBinding[]
-					const startBinding = arrowBindings.find((b) => b.props.terminal === 'start')
-					const endBinding = arrowBindings.find((b) => b.props.terminal === 'end')
-
-					return {
-						shapeId: s.id,
-						type: 'arrow',
-						fromId: startBinding?.toId ?? null,
-						toId: endBinding?.toId ?? null,
-						x1: s.props.start.x,
-						y1: s.props.start.y,
-						x2: s.props.end.x,
-						y2: s.props.end.y,
-						color: s.props.color,
-						text: s.props.text,
-						note: (s.meta?.description as string) ?? '',
-					}
-				}
-
-				if (shape.type === 'note') {
-					const s = shape as TLNoteShape
-					return {
-						shapeId: s.id,
-						type: 'note',
-						x: s.x,
-						y: s.y,
-						color: s.props.color,
-						text: s.props.richText,
-						note: (s.meta?.description as string) ?? '',
-					}
-				}
-
-				// Any other shape is unknown
-				return {
-					shapeId: shape.id,
-					type: 'unknown',
-					note: (shape.meta?.description as string) ?? '',
-					x: shape.x,
-					y: shape.y,
-				}
+				// Skip all other shape types
+				return undefined
 			})
 		),
 	}

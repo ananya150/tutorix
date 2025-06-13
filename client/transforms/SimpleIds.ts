@@ -8,14 +8,16 @@ export class SimpleIds extends TldrawAiTransform {
 	nextSimpleId = 0
 
 	override transformPrompt = (input: TLAiPrompt) => {
-		// Collect all ids, write simple ids, and write the simple ids
+		// Collect all ids, write simple ids, and write the simple ids (text shapes only)
 		for (const shape of input.canvasContent.shapes ?? []) {
-			this.collectAllIdsRecursively(shape, this.mapObjectWithIdAndWriteSimple)
+			// Only process text shapes
+			if (shape.type === 'text') {
+				this.collectAllIdsRecursively(shape, this.mapObjectWithIdAndWriteSimple)
+			}
 		}
 
-		for (const binding of input.canvasContent.bindings ?? []) {
-			this.collectAllIdsRecursively(binding, this.mapObjectWithIdAndWriteSimple)
-		}
+		// Note: We don't process bindings since we're only dealing with text shapes
+		// Bindings are typically for arrows/connections which we're not supporting
 
 		return input
 	}
@@ -24,6 +26,12 @@ export class SimpleIds extends TldrawAiTransform {
 		switch (change.type) {
 			case 'createShape': {
 				const { shape } = change
+				
+				// Only handle text shapes
+				if (shape.type !== 'text') {
+					return change
+				}
+
 				const { id: simpleId } = shape
 				const originalId = createShapeId(simpleId)
 				this.originalIdsToSimpleIds.set(originalId, simpleId)
@@ -36,11 +44,16 @@ export class SimpleIds extends TldrawAiTransform {
 				}
 			}
 			case 'updateShape': {
-				const shape = this.collectAllIdsRecursively(change.shape, this.writeOriginalIds)
+				// Check if this is a text shape update
+				if (change.shape.type && change.shape.type !== 'text') {
+					return change
+				}
+
+				const updatedShape = this.collectAllIdsRecursively(change.shape, this.writeOriginalIds)
 
 				return {
 					...change,
-					shape,
+					shape: updatedShape,
 				}
 			}
 			case 'deleteShape': {
@@ -50,43 +63,14 @@ export class SimpleIds extends TldrawAiTransform {
 				}
 				return {
 					...change,
-					shapeId, // this isn't going to be in our map of ids
+					shapeId,
 				}
 			}
-			case 'createBinding': {
-				let { binding } = change
-
-				const { id: simpleId } = binding
-				const originalId = createBindingId(simpleId)
-				this.originalIdsToSimpleIds.set(originalId, simpleId)
-				this.simpleIdsToOriginalIds.set(simpleId, originalId)
-				binding.id = originalId
-
-				binding = this.collectAllIdsRecursively(change.binding, this.writeOriginalIds)
-
-				return {
-					...change,
-					binding,
-				}
-			}
-			case 'updateBinding': {
-				const binding = this.collectAllIdsRecursively(change.binding, this.writeOriginalIds)
-
-				return {
-					...change,
-					binding,
-				}
-			}
-			case 'deleteBinding': {
-				const bindingId = this.simpleIdsToOriginalIds.get(change.bindingId)
-				if (!bindingId) {
-					throw new Error(`Binding id not found: ${change.bindingId}`)
-				}
-				return {
-					...change,
-					bindingId,
-				}
-			}
+			// Skip binding-related cases since we're text-only
+			case 'createBinding':
+			case 'updateBinding':
+			case 'deleteBinding':
+				return change
 			default:
 				return exhaustiveSwitchError(change)
 		}
