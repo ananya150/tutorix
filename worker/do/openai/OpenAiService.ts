@@ -20,6 +20,8 @@ export class OpenAiService extends TldrawAiBaseService {
 		const events = await generateEvents(this.openai, prompt)
 		if (this.env.LOG_LEVEL === 'debug') console.log(events)
 		const changes = events.map((event) => getTldrawAiChangesFromSimpleEvents(prompt, event)).flat()
+		console.log('######################## GENERATE ########################')
+		console.log(changes)
 		return { changes }
 	}
 
@@ -27,6 +29,8 @@ export class OpenAiService extends TldrawAiBaseService {
 		for await (const simpleEvent of streamEvents(this.openai, prompt)) {
 			if (this.env.LOG_LEVEL === 'debug') console.log(simpleEvent)
 			for (const change of getTldrawAiChangesFromSimpleEvents(prompt, simpleEvent)) {
+				console.log('######################## STREAM ########################')
+				console.log(change)
 				yield change
 			}
 		}

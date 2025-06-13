@@ -4,6 +4,7 @@ import { AutoRouter, error } from 'itty-router'
 import { TldrawAiBaseService } from '../TldrawAiBaseService'
 import { Environment } from '../types'
 import { OpenAiService } from './openai/OpenAiService'
+import { CustomProviderService } from './custom/CustomProviderService'
 
 export class TldrawAiDurableObject extends DurableObject<Environment> {
 	service: TldrawAiBaseService
