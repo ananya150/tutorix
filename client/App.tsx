@@ -6,7 +6,7 @@ function App() {
 	const [editor, setEditor] = useState<Editor | null>(null) // [1]
 	return (
 		<div className="tldraw-ai-container">
-			<Tldraw  persistenceKey="tldraw-ai-demo-2"  onMount={setEditor} />
+			<Tldraw hideUi  onMount={setEditor} />
 			{editor && <InputBar editor={editor} />}
 		</div>
 	)
@@ -68,12 +68,33 @@ function InputBar({ editor }: { editor: Editor }) {
 		[prompt]
 	)
 
+	const handleReset = async () => {
+		try {
+			console.log('Resetting grid state')
+			const response = await fetch('/reset', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			})
+			if (!response.ok) {
+				throw new Error(`HTTP error! status: ${response.status}`)
+			}
+			console.log('Reset successful:', response)
+			// Force a page reload to clear the canvas
+			window.location.reload()
+		} catch (error) {
+			console.error('Reset failed:', error)
+		}
+	}
+
 	return (
 		<div className="prompt-input">
 			<form onSubmit={handleSubmit}>
 				<input name="input" type="text" autoComplete="off" placeholder="Enter your prompt…" />
-				<button>{isGenerating ? <DefaultSpinner /> : 'Send'}</button>
+				<button type="submit">{isGenerating ? <DefaultSpinner /> : 'Send'}</button>
 			</form>
+			<button type="button" onClick={handleReset} className="reset-button">Reset</button>
 		</div>
 	)
 }

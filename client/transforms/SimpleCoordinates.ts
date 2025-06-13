@@ -11,6 +11,16 @@ export class SimpleCoordinates extends TldrawAiTransform {
 		// Save the original coordinates of context bounds (the user's viewport)
 		this.bounds = contextBounds.clone()
 
+		// Add canvas dimensions to the prompt for responsive grid system
+		// Get the actual canvas/viewport dimensions
+		const canvasDimensions = {
+			width: contextBounds.width,
+			height: contextBounds.height
+		}
+		
+		// Add canvas dimensions to the prompt (we'll use this in the worker)
+		;(input as any).canvasDimensions = canvasDimensions
+
 		// Save the original coordinates of all shapes (text only)
 		for (const s of canvasContent.shapes) {
 			// Only process text shapes

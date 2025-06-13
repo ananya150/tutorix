@@ -34,12 +34,16 @@ export class GridManager {
 	private state: GridState
 	private metadata: GridMetadata
 
-	constructor() {
+	constructor(canvasWidth?: number) {
+		// Use provided canvas width or fallback to default
+		const actualCanvasWidth = canvasWidth || 1200
+		const columnWidth = actualCanvasWidth / 12
+		
 		this.metadata = {
 			totalColumns: 12,
 			rowHeight: 60, // pixels
-			columnWidth: 100, // pixels  
-			canvasWidth: 1200, // 12 * 100
+			columnWidth: columnWidth, // responsive width per column
+			canvasWidth: actualCanvasWidth, // actual canvas width
 			canvasHeight: 0 // grows dynamically
 		}
 
@@ -204,5 +208,35 @@ export class GridManager {
 			width: this.metadata.canvasWidth,
 			height: this.metadata.canvasHeight
 		}
+	}
+
+	/**
+	 * Get full state for persistence
+	 */
+	getFullState(): { state: GridState; metadata: GridMetadata } {
+		return {
+			state: {
+				...this.state,
+				occupiedCells: Array.from(this.state.occupiedCells) // Convert Set to Array for JSON
+			} as any,
+			metadata: { ...this.metadata }
+		}
+	}
+
+	/**
+	 * Restore state from persistence
+	 */
+	restoreState(savedState: { state: GridState; metadata: GridMetadata }) {
+		this.state = {
+			...savedState.state,
+			occupiedCells: new Set(savedState.state.occupiedCells as any) // Convert Array back to Set
+		}
+		this.metadata = { ...savedState.metadata }
+		
+		console.log('Grid state restored:', {
+			currentRow: this.state.currentRow,
+			contentHistoryLength: this.state.contentHistory.length,
+			occupiedCellsCount: this.state.occupiedCells.size
+		})
 	}
 } 

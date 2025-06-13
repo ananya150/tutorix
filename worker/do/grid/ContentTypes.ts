@@ -34,13 +34,13 @@ export interface ContentTypeLayout {
 
 export const CONTENT_TYPE_LAYOUTS: Record<ContentType, ContentTypeLayout> = {
 	[ContentType.TITLE]: {
-		columnStart: 3,
-		columnEnd: 10,
+		columnStart: 1,
+		columnEnd: 12,
 		alignment: 'middle',
 		fontSize: 'xlarge',
 		fontWeight: 'bold',
 		color: 'black',
-		spacing: { top: 1, bottom: 2 }
+		spacing: { top: 0, bottom: 1 }
 	},
 
 	[ContentType.HEADING]: {
@@ -50,11 +50,11 @@ export const CONTENT_TYPE_LAYOUTS: Record<ContentType, ContentTypeLayout> = {
 		fontSize: 'large',
 		fontWeight: 'bold',
 		color: 'black',
-		spacing: { top: 1, bottom: 1 }
+		spacing: { top: 0, bottom: 0 }
 	},
 
 	[ContentType.SUBHEADING]: {
-		columnStart: 3,
+		columnStart: 2,
 		columnEnd: 11,
 		alignment: 'start',
 		fontSize: 'medium',
@@ -64,8 +64,8 @@ export const CONTENT_TYPE_LAYOUTS: Record<ContentType, ContentTypeLayout> = {
 	},
 
 	[ContentType.DEFINITION]: {
-		columnStart: 1,
-		columnEnd: 12,
+		columnStart: 2,
+		columnEnd: 11,
 		alignment: 'start',
 		fontSize: 'normal',
 		fontWeight: 'normal',
@@ -74,8 +74,8 @@ export const CONTENT_TYPE_LAYOUTS: Record<ContentType, ContentTypeLayout> = {
 	},
 
 	[ContentType.BULLET]: {
-		columnStart: 2,
-		columnEnd: 12,
+		columnStart: 3,
+		columnEnd: 11,
 		alignment: 'start',
 		fontSize: 'normal',
 		fontWeight: 'normal',
@@ -85,8 +85,8 @@ export const CONTENT_TYPE_LAYOUTS: Record<ContentType, ContentTypeLayout> = {
 	},
 
 	[ContentType.NUMBERED]: {
-		columnStart: 2,
-		columnEnd: 12,
+		columnStart: 3,
+		columnEnd: 11,
 		alignment: 'start',
 		fontSize: 'normal',
 		fontWeight: 'normal',
@@ -96,8 +96,8 @@ export const CONTENT_TYPE_LAYOUTS: Record<ContentType, ContentTypeLayout> = {
 	},
 
 	[ContentType.FORMULA]: {
-		columnStart: 4,
-		columnEnd: 9,
+		columnStart: 5,
+		columnEnd: 8,
 		alignment: 'middle',
 		fontSize: 'normal',
 		fontWeight: 'normal',
@@ -107,8 +107,8 @@ export const CONTENT_TYPE_LAYOUTS: Record<ContentType, ContentTypeLayout> = {
 	},
 
 	[ContentType.NOTE]: {
-		columnStart: 8,
-		columnEnd: 12,
+		columnStart: 7,
+		columnEnd: 11,
 		alignment: 'start',
 		fontSize: 'small',
 		fontWeight: 'normal',
@@ -118,7 +118,7 @@ export const CONTENT_TYPE_LAYOUTS: Record<ContentType, ContentTypeLayout> = {
 	},
 
 	[ContentType.EXAMPLE]: {
-		columnStart: 2,
+		columnStart: 3,
 		columnEnd: 11,
 		alignment: 'start',
 		fontSize: 'normal',
@@ -129,8 +129,8 @@ export const CONTENT_TYPE_LAYOUTS: Record<ContentType, ContentTypeLayout> = {
 	},
 
 	[ContentType.SUMMARY]: {
-		columnStart: 1,
-		columnEnd: 12,
+		columnStart: 2,
+		columnEnd: 11,
 		alignment: 'start',
 		fontSize: 'normal',
 		fontWeight: 'medium',

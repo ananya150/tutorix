@@ -69,13 +69,30 @@ export function canvasCoordinatesToGridPosition(
 /**
  * Generate tldraw text shape from grid configuration
  */
-export function createTextShapeFromGrid(config: TextShapeConfig): Partial<TLTextShape> {
+export function createTextShapeFromGrid(config: TextShapeConfig, metadata: GridMetadata): Partial<TLTextShape> {
 	const { canvasPosition, layout, text, contentType } = config
 
 	// Map content type styling to tldraw properties
 	const fontSize = mapFontSizeToTldraw(layout.fontSize)
 	const color = mapColorToTldraw(layout.color)
 	const textAlign = mapAlignmentToTldraw(layout.alignment)
+
+	// For centered alignment, use the full column span width and let textAlign do the centering
+	const useAutoSize = layout.alignment !== 'middle'
+	
+	// Calculate the full column span width for centered content
+	let textWidth = canvasPosition.width || 200
+	if (layout.alignment === 'middle') {
+		// For centered content, use the actual canvas width for perfect centering
+		if (contentType === 'title') {
+			// Use the full canvas width from metadata for responsive centering
+			textWidth = metadata.canvasWidth
+		} else {
+			// For other centered content (like formulas), use column span
+			const { columnStart, columnEnd } = config.gridPosition
+			textWidth = (columnEnd - columnStart + 1) * metadata.columnWidth
+		}
+	}
 
 	return {
 		id: createShapeId(config.id),
@@ -88,8 +105,8 @@ export function createTextShapeFromGrid(config: TextShapeConfig): Partial<TLText
 			textAlign: textAlign,
 			size: fontSize,
 			font: layout.fontFamily === 'monospace' ? 'mono' : 'draw',
-			w: canvasPosition.width || 200, // default width
-			autoSize: true, // let text determine its size
+			w: textWidth,
+			autoSize: useAutoSize, // disable autoSize for centered text to allow proper centering
 			scale: 1, // required property
 		},
 		meta: {
@@ -99,6 +116,8 @@ export function createTextShapeFromGrid(config: TextShapeConfig): Partial<TLText
 		}
 	}
 }
+
+
 
 /**
  * Map content type font size to tldraw size
@@ -212,20 +231,9 @@ export function generateTextShapeConfig(
 ): TextShapeConfig {
 	const layout = getContentTypeLayout(contentType)
 	
-	// Apply spacing to determine final row position
-	const finalRow = applySpacingToRow(
-		gridPosition.row,
-		contentType,
-		{
-			previousContentType: context?.previousContentType,
-			isFirstContent: context?.isFirstContent
-		}
-	)
-
-	// Update grid position with final row
+	// Use the grid position as-is (spacing already handled in main logic)
 	const finalGridPosition: GridPosition = {
-		...gridPosition,
-		row: finalRow
+		...gridPosition
 	}
 
 	// Convert to canvas coordinates
