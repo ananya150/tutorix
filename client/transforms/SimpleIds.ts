@@ -1,6 +1,5 @@
 import { TLAiChange, TLAiPrompt, TldrawAiTransform } from '@tldraw/ai'
 import { createBindingId, createShapeId } from '@tldraw/tlschema'
-import { exhaustiveSwitchError } from '../utils'
 
 export class SimpleIds extends TldrawAiTransform {
 	originalIdsToSimpleIds = new Map()
@@ -72,7 +71,8 @@ export class SimpleIds extends TldrawAiTransform {
 			case 'deleteBinding':
 				return change
 			default:
-				return exhaustiveSwitchError(change)
+				// For any other change types (including camera), pass through unchanged
+				return change
 		}
 	}
 

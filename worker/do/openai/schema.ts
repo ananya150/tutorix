@@ -86,14 +86,22 @@ export type ISimpleDeleteEvent = z.infer<typeof SimpleDeleteEvent>
 
 const SimpleThinkEvent = z.object({
 	type: z.literal('think'),
-	text: z.string(),
-	intent: z.string(),
+	reasoning: z.string(),
 })
+
+const SimpleCameraEvent = z.object({
+	type: z.literal('camera'),
+	targetRow: z.number(), // The row where new content will be added
+	reasoning: z.string(), // Why this camera position was chosen
+})
+
 export type ISimpleThinkEvent = z.infer<typeof SimpleThinkEvent>
+export type ISimpleCameraEvent = z.infer<typeof SimpleCameraEvent>
 
 export const SimpleEvent = z.union([
 	SimpleThinkEvent,
-	SimpleCreateEvent, // or update
+	SimpleCameraEvent,
+	SimpleCreateEvent,
 	SimpleDeleteEvent,
 	SimpleMoveEvent,
 ])

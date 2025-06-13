@@ -101565,55 +101565,94 @@ Each event must include:
 - Only create text elements - do not attempt to create any other shape types.
 - Multiple items can be placed in the same row if they don't overlap horizontally.
 
+# Camera Management
+
+When creating content, you should first position the camera to ensure the user can see the new content:
+
+## Camera Positioning Rules:
+1. **Always send a camera event first** before creating content
+2. **For rows < 12**: Position camera to show from row 1 (early content)
+3. **For rows ≥ 12**: Position camera to show the target row with 5 empty rows below it
+4. **Reasoning**: Always explain why you chose this camera position
+
+## Camera Event Format:
+\`\`\`json
+{
+  "type": "camera",
+  "targetRow": 15,
+  "reasoning": "Positioning camera to show row 15 with 5 empty rows below for new content visibility"
+}
+\`\`\`
+
+# Response Format
+
+Always respond with a JSON object containing:
+- \`long_description_of_strategy\`: Your reasoning for the camera position and content placement
+- \`events\`: Array of events, starting with camera positioning, then content creation
+
 # Examples
 
-Developer: Canvas Layout Information:
-- Window size: 1461px × 969px
-- Canvas area: 1217px × 939px
-- Horizontal padding: 122px on each side
-- Top margin: 40px
-- Row height: 80px
-
-User: Create a title "Newton's Laws of Motion" and add a heading "First Law"
+## Example 1: Early Content (Row < 12)
+User: "Add a title 'Introduction to Physics'"
 Assistant: {
-	"long_description_of_strategy": "I will create two text elements with explicit positioning: a main title centered in row 1 with large width for prominence, and a heading in row 3 (leaving row 2 empty for spacing) positioned left with medium width for proper hierarchy.",
+	"long_description_of_strategy": "I will first position the camera to show from row 1 since this is early content, then create a centered title in row 1 with large, bold styling for prominence.",
 	"events": [
+		{
+			"type": "camera",
+			"targetRow": 1,
+			"reasoning": "Positioning camera to show from row 1 for early content visibility"
+		},
 		{
 			"type": "create",
 			"shape": {
 				"type": "text",
-				"shapeId": "main-title",
-				"note": "Main lesson title about Newton's Laws",
+				"shapeId": "intro-title",
+				"note": "Main introduction title",
 				"row": 1,
 				"horizontalPosition": "center",
 				"width": "3/4",
-				"text": "Newton's Laws of Motion",
+				"text": "Introduction to Physics",
 				"textAlign": "center",
 				"fontSize": "xlarge",
 				"fontWeight": "bold",
 				"color": "black"
 			},
 			"intent": "Create the main title centered in row 1 with large, bold styling"
+		}
+	]
+}
+
+## Example 2: Later Content (Row ≥ 12)
+User: "Add a heading 'Advanced Topics' in row 20"
+Assistant: {
+	"long_description_of_strategy": "I will first position the camera to show row 20 with 5 empty rows below it for context, then create a left-aligned heading with appropriate styling.",
+	"events": [
+		{
+			"type": "camera",
+			"targetRow": 20,
+			"reasoning": "Positioning camera to show row 20 with 5 empty rows below for new content visibility"
 		},
 		{
 			"type": "create",
 			"shape": {
 				"type": "text",
-				"shapeId": "first-law-heading",
-				"note": "Heading for the first law section",
-				"row": 3,
+				"shapeId": "advanced-heading",
+				"note": "Section heading for advanced topics",
+				"row": 20,
 				"horizontalPosition": "left",
 				"width": "1/2",
-				"text": "First Law",
+				"text": "Advanced Topics",
 				"textAlign": "left",
 				"fontSize": "large",
 				"fontWeight": "bold",
 				"color": "black"
 			},
-			"intent": "Create the section heading in row 3, left-aligned with medium width"
+			"intent": "Create section heading in row 20, left-aligned with medium width"
 		}
 	]
 }
+
+Remember: Camera positioning ensures users always see new content being added, creating a smooth and intuitive experience.
 `;
 function calculateCanvasDimensions(windowWidth, windowHeight) {
   const REFERENCE_WIDTH = 1461;
@@ -106716,13 +106755,19 @@ const SimpleDeleteEvent = objectType({
 });
 const SimpleThinkEvent = objectType({
   type: literalType("think"),
-  text: stringType(),
-  intent: stringType()
+  reasoning: stringType()
+});
+const SimpleCameraEvent = objectType({
+  type: literalType("camera"),
+  targetRow: numberType(),
+  // The row where new content will be added
+  reasoning: stringType()
+  // Why this camera position was chosen
 });
 const SimpleEvent = unionType([
   SimpleThinkEvent,
+  SimpleCameraEvent,
   SimpleCreateEvent,
-  // or update
   SimpleDeleteEvent,
   SimpleMoveEvent
 ]);
@@ -106747,6 +106792,45 @@ async function generateEvents(model2, prompt) {
   }
   return json.events;
 }
+function calculateOptimalCameraPosition(targetRow, canvasDimensions) {
+  const { rowHeight, topMargin, horizontalPadding } = canvasDimensions;
+  const TYPICAL_VIEWPORT_HEIGHT = 800;
+  const ROWS_PER_SCREEN = Math.floor((TYPICAL_VIEWPORT_HEIGHT - topMargin) / rowHeight);
+  const MIN_EMPTY_ROWS_BELOW = 5;
+  console.log("📹 Camera calculation inputs:", {
+    targetRow,
+    rowHeight,
+    topMargin,
+    ROWS_PER_SCREEN,
+    MIN_EMPTY_ROWS_BELOW
+  });
+  let topRow;
+  let reasoning;
+  if (targetRow < 12) {
+    topRow = 1;
+    reasoning = `Target row ${targetRow} is early in document, showing from row 1 to provide full context`;
+  } else {
+    const desiredBottomRow = targetRow + MIN_EMPTY_ROWS_BELOW;
+    topRow = Math.max(1, desiredBottomRow - ROWS_PER_SCREEN + 1);
+    reasoning = `Target row ${targetRow} positioned with ${MIN_EMPTY_ROWS_BELOW} empty rows below, showing rows ${topRow}-${topRow + ROWS_PER_SCREEN - 1}`;
+  }
+  const cameraY = topMargin + (topRow - 1) * rowHeight;
+  const cameraX = horizontalPadding;
+  const cameraZ = 1;
+  const visibleRows = {
+    top: topRow,
+    bottom: topRow + ROWS_PER_SCREEN - 1,
+    target: targetRow,
+    emptyRowsBelow: Math.max(0, topRow + ROWS_PER_SCREEN - 1 - targetRow)
+  };
+  const result = {
+    position: { x: cameraX, y: cameraY, z: cameraZ },
+    reasoning,
+    visibleRows
+  };
+  console.log("📹 Camera calculation result:", result);
+  return result;
+}
 function getTldrawAiChangesFromSimpleEvents(prompt, event) {
   switch (event.type) {
     case "update":
@@ -106758,6 +106842,9 @@ function getTldrawAiChangesFromSimpleEvents(prompt, event) {
     }
     case "move": {
       return getTldrawAiChangesFromSimpleMoveEvent(prompt, event);
+    }
+    case "camera": {
+      return getTldrawAiChangesFromSimpleCameraEvent(prompt, event);
     }
     case "think": {
       return [];
@@ -106902,6 +106989,30 @@ function getTldrawAiChangesFromSimpleMoveEvent(prompt, event) {
       }
     }
   ];
+}
+function getTldrawAiChangesFromSimpleCameraEvent(prompt, event) {
+  const canvasDimensions = prompt.canvasDimensions;
+  if (!canvasDimensions) {
+    console.error("Canvas dimensions not found in prompt for camera event");
+    return [];
+  }
+  console.log("📹 Processing camera event:", event);
+  const responsiveCanvas = calculateCanvasDimensions(
+    canvasDimensions.width,
+    canvasDimensions.height
+  );
+  const cameraResult = calculateOptimalCameraPosition(event.targetRow, responsiveCanvas);
+  console.log("📹 Camera change created:", {
+    targetRow: event.targetRow,
+    position: cameraResult.position,
+    visibleRows: cameraResult.visibleRows
+  });
+  return [{
+    type: "camera",
+    description: `Move camera to show row ${event.targetRow} with proper context`,
+    camera: cameraResult.position,
+    reasoning: cameraResult.reasoning
+  }];
 }
 var parse = {};
 var hasRequiredParse;

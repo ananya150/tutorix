@@ -24,6 +24,7 @@ import {
 	ISimpleEvent,
 	ISimpleFill,
 	ISimpleMoveEvent,
+	ISimpleCameraEvent,
 } from './schema'
 import { 
 	calculateCanvasDimensions, 
@@ -33,6 +34,19 @@ import {
 	mapColor,
 	PositionSpec 
 } from '../positioning/CanvasCalculator'
+import { calculateOptimalCameraPosition } from '../positioning/CameraManager'
+
+// Custom change type for camera positioning
+interface TLAiCameraChange {
+	type: 'camera'
+	description: string
+	camera: {
+		x: number
+		y: number
+		z: number
+	}
+	reasoning: string
+}
 
 export function getTldrawAiChangesFromSimpleEvents(
 	prompt: TLAiSerializedPrompt,
@@ -48,6 +62,9 @@ export function getTldrawAiChangesFromSimpleEvents(
 		}
 		case 'move': {
 			return getTldrawAiChangesFromSimpleMoveEvent(prompt, event)
+		}
+		case 'camera': {
+			return getTldrawAiChangesFromSimpleCameraEvent(prompt, event)
 		}
 		case 'think': {
 			return []
@@ -241,5 +258,41 @@ function getTldrawAiChangesFromSimpleMoveEvent(
 			},
 		},
 	]
+}
+
+function getTldrawAiChangesFromSimpleCameraEvent(
+	prompt: TLAiSerializedPrompt,
+	event: ISimpleCameraEvent
+): TLAiCameraChange[] {
+	// Get canvas dimensions from the prompt
+	const canvasDimensions = (prompt as any).canvasDimensions
+	if (!canvasDimensions) {
+		console.error('Canvas dimensions not found in prompt for camera event')
+		return []
+	}
+
+	console.log('📹 Processing camera event:', event)
+
+	// Calculate responsive canvas dimensions
+	const responsiveCanvas = calculateCanvasDimensions(
+		canvasDimensions.width,
+		canvasDimensions.height
+	)
+
+	// Calculate optimal camera position
+	const cameraResult = calculateOptimalCameraPosition(event.targetRow, responsiveCanvas)
+
+	console.log('📹 Camera change created:', {
+		targetRow: event.targetRow,
+		position: cameraResult.position,
+		visibleRows: cameraResult.visibleRows
+	})
+
+	return [{
+		type: 'camera',
+		description: `Move camera to show row ${event.targetRow} with proper context`,
+		camera: cameraResult.position,
+		reasoning: cameraResult.reasoning
+	}]
 }
 
