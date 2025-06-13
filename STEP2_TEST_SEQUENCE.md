@@ -1,11 +1,17 @@
-# Step 2 Test Sequence: Grid-Based AI System Validation
+# Step 2 Test Sequence: Explicit Positioning AI System Validation
+
+## Recent Improvements ✨
+- **Reduced horizontal margins**: Changed from windowWidth/12 to windowWidth/16 for more usable canvas space
+- **Added text box spacing**: 8px padding between adjacent text boxes to prevent crowding
+- **Improved positioning**: Small offsets for middle/right positioned boxes for better visual separation
 
 ## Overview
-This test sequence validates that our grid-based AI system correctly:
-- Detects content types from instructions
-- Positions content using semantic grid layout
-- Applies appropriate styling for each content type
-- Maintains educational flow and proper spacing
+This test sequence validates that our explicit positioning AI system correctly:
+- Interprets explicit positioning instructions (row, position, width)
+- Places content at specified locations with proper dimensions
+- Handles multiple items per row without overlap
+- Applies appropriate styling (fontSize, fontWeight, textAlign)
+- Creates responsive layouts with flexible width specifications
 
 ## Test Instructions
 1. **Clear the canvas** before starting (refresh page if needed)
@@ -17,113 +23,167 @@ This test sequence validates that our grid-based AI system correctly:
 
 ## Test Sequence
 
-### Test 1: Title Detection and Positioning
-**Prompt:** `Write the main title "Newton's Laws of Motion"`
+### Test 1: Main Title with Explicit Positioning
+**Prompt:** `Create textbox with "Newton's Laws of Motion" in row 1, center position, width 3/4, fontSize xlarge, fontWeight bold, textAlign center`
 
 **Expected Result:**
-- Content Type: `title`
-- Position: Row 1, Columns 3-10 (centered)
-- Styling: Extra large font, bold, centered alignment
-- Grid Position: `{"row":1,"columnStart":3,"columnEnd":10}`
+- Position: Row 1, centered horizontally
+- Width: 3/4 of canvas width
+- Styling: Extra large font, bold, center-aligned
+- Coordinates: Calculated from canvas dimensions
 
 ---
 
-### Test 2: Heading After Title
-**Prompt:** `next paragraph. Write heading "First Law of Motion"`
+### Test 2: Three Law Headings in Same Row
+**Prompt:** `Create textbox with "Newton's First Law" in row 3, position 0.0, width 1/3, fontSize large, fontWeight bold, textAlign center`
 
 **Expected Result:**
-- Content Type: `heading`
-- Position: Row 3, Columns 2-11 (with spacing after title)
-- Styling: Large font, bold, left-aligned
-- Educational Flow: Title → Heading (proper sequence)
+- Position: Row 3, left third of canvas
+- Width: 1/3 of canvas width
+- Styling: Large font, bold, center-aligned within box
 
 ---
 
-### Test 3: Definition Content
-**Prompt:** `Explain the definition: An object at rest stays at rest unless acted upon by an external force`
+### Test 3: Second Law Heading (Middle Third)
+**Prompt:** `Create textbox with "Newton's Second Law" in row 3, position 0.333, width 1/3, fontSize large, fontWeight bold, textAlign center`
 
 **Expected Result:**
-- Content Type: `definition`
-- Position: Row 4, Columns 1-12 (full width)
-- Styling: Normal font, left-aligned
-- Educational Flow: Heading → Definition
+- Position: Row 3, middle third of canvas
+- Width: 1/3 of canvas width
+- Styling: Large font, bold, center-aligned within box
+- Layout: Adjacent to first law heading
 
 ---
 
-### Test 4: Bullet Points
-**Prompt:** `next paragraph. List the key points about inertia`
+### Test 4: Third Law Heading (Right Third)
+**Prompt:** `Create textbox with "Newton's Third Law" in row 3, position 0.667, width 1/3, fontSize large, fontWeight bold, textAlign center`
 
 **Expected Result:**
-- Content Type: `bullet`
-- Position: Row 5, Columns 2-12 (indented)
-- Styling: Normal font with bullet prefix
-- Educational Flow: Definition → Bullet points
+- Position: Row 3, right third of canvas
+- Width: 1/3 of canvas width
+- Styling: Large font, bold, center-aligned within box
+- Layout: Completes the three-column header row
 
 ---
 
-### Test 5: Numbered Steps
-**Prompt:** `next paragraph. Write the steps to calculate force`
+### Test 5: First Law Description
+**Prompt:** `Create textbox with "An object at rest stays at rest, and an object in motion stays in motion, unless acted upon by an external force" in row 5, position 0.0, width 1/3, fontSize medium, fontWeight normal, textAlign left`
 
 **Expected Result:**
-- Content Type: `numbered`
-- Position: Row 6, Columns 2-12 (indented)
-- Styling: Normal font with number prefix
-- Educational Flow: Continuing list format
+- Position: Row 5, left third (under First Law heading)
+- Width: 1/3 of canvas width
+- Styling: Medium font, normal weight, left-aligned
+- Content: First law definition
 
 ---
 
-### Test 6: Mathematical Formula
-**Prompt:** `Write the formula F = ma`
+### Test 6: Second Law Description
+**Prompt:** `Create textbox with "The acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass" in row 5, position 0.333, width 1/3, fontSize medium, fontWeight normal, textAlign left`
 
 **Expected Result:**
-- Content Type: `formula`
-- Position: Row 7, Columns 4-9 (centered, narrower)
-- Styling: Monospace font, centered alignment
-- Mathematical Content: Properly detected
+- Position: Row 5, middle third (under Second Law heading)
+- Width: 1/3 of canvas width
+- Styling: Medium font, normal weight, left-aligned
+- Content: Second law definition
 
 ---
 
-### Test 7: Example Content
-**Prompt:** `Give an example of the first law in action`
+### Test 7: Third Law Description
+**Prompt:** `Create textbox with "For every action, there is an equal and opposite reaction" in row 5, position 0.667, width 1/3, fontSize medium, fontWeight normal, textAlign left`
 
 **Expected Result:**
-- Content Type: `example`
-- Position: Row 8, Columns 2-11 (slightly indented)
-- Styling: Normal font with background highlight
-- Educational Flow: Formula → Example
+- Position: Row 5, right third (under Third Law heading)
+- Width: 1/3 of canvas width
+- Styling: Medium font, normal weight, left-aligned
+- Content: Third law definition
 
 ---
 
-### Test 8: Side Note
-**Prompt:** `Add a note about historical context`
+### Test 8: First Law Formula
+**Prompt:** `Create textbox with "F = 0 → a = 0" in row 8, position 0.0, width 1/3, fontSize medium, fontWeight normal, textAlign center`
 
 **Expected Result:**
-- Content Type: `note`
-- Position: Row 9, Columns 8-12 (right-aligned)
-- Styling: Small font, italic, right side
-- Layout: Side note positioning
+- Position: Row 7, left third (under First Law)
+- Width: 1/3 of canvas width
+- Styling: Medium font, center-aligned
+- Content: Mathematical representation
 
 ---
 
-### Test 9: Subheading
-**Prompt:** `Write subheading "Applications in Daily Life"`
+### Test 9: Second Law Formula
+**Prompt:** `Create textbox with "F = ma" in row 8, position 0.333, width 1/3, fontSize medium, fontWeight normal, textAlign center`
 
 **Expected Result:**
-- Content Type: `subheading`
-- Position: Row 10, Columns 3-11 (more indented than heading)
-- Styling: Medium font, semi-bold
-- Hierarchy: Proper subsection formatting
+- Position: Row 7, middle third (under Second Law)
+- Width: 1/3 of canvas width
+- Styling: Medium font, center-aligned
+- Content: Famous F=ma equation
 
 ---
 
-### Test 10: Summary Content
-**Prompt:** `Write a summary of Newton's first law`
+### Test 10: Third Law Formula
+**Prompt:** `Create textbox with "F₁ = -F₂" in row 8, position 0.667, width 1/3, fontSize medium, fontWeight normal, textAlign center`
 
 **Expected Result:**
-- Content Type: `summary`
-- Position: Row 11, Columns 1-12 (full width)
-- Styling: Medium weight font with top border
-- Educational Flow: Concluding content
+- Position: Row 7, right third (under Third Law)
+- Width: 1/3 of canvas width
+- Styling: Medium font, center-aligned
+- Content: Action-reaction formula
+
+---
+
+### Test 11: Example Applications Row
+**Prompt:** `Create textbox with "Examples: Car braking, objects on table" in row 10, position 0.0, width 1/3, fontSize small, fontWeight normal, textAlign left`
+
+**Expected Result:**
+- Position: Row 9, left third
+- Width: 1/3 of canvas width
+- Styling: Small font, left-aligned
+- Content: First law examples
+
+---
+
+### Test 12: Second Law Examples
+**Prompt:** `Create textbox with "Examples: Pushing cart, rocket propulsion" in row 10, position 0.333, width 1/3, fontSize small, fontWeight normal, textAlign left`
+
+**Expected Result:**
+- Position: Row 9, middle third
+- Width: 1/3 of canvas width
+- Styling: Small font, left-aligned
+- Content: Second law examples
+
+---
+
+### Test 13: Third Law Examples
+**Prompt:** `Create textbox with "Examples: Walking, swimming, rocket thrust" in row 10, position 0.667, width 1/3, fontSize small, fontWeight normal, textAlign left`
+
+**Expected Result:**
+- Position: Row 9, right third
+- Width: 1/3 of canvas width
+- Styling: Small font, left-aligned
+- Content: Third law examples
+
+---
+
+### Test 14: Summary Section
+**Prompt:** `Create textbox with "Summary: These three laws form the foundation of classical mechanics and explain the motion of objects in our everyday world" in row 12, center position, width 3/4, fontSize medium, fontWeight bold, textAlign center`
+
+**Expected Result:**
+- Position: Row 11, centered
+- Width: 3/4 of canvas width
+- Styling: Medium font, bold, center-aligned
+- Content: Concluding summary
+
+---
+
+### Test 15: Bullet Point Test
+**Prompt:** `Create textbox with "Key takeaway: Forces cause acceleration" in row 14, left position, width 1/2, fontSize medium, fontWeight normal, textAlign left, bullet true`
+
+**Expected Result:**
+- Position: Row 13, left side
+- Width: 1/2 of canvas width
+- Styling: Medium font with bullet point prefix
+- Content: Bullet point automatically added
 
 ---
 
@@ -131,54 +191,47 @@ This test sequence validates that our grid-based AI system correctly:
 
 After completing all tests, verify:
 
-### ✅ Content Type Detection
-- [ ] Title: Detected from "main title" instruction
-- [ ] Heading: Detected from "heading" instruction  
-- [ ] Definition: Detected from "explain the definition" instruction
-- [ ] Bullet: Detected from "list the key points" instruction
-- [ ] Numbered: Detected from "write the steps" instruction
-- [ ] Formula: Detected from mathematical content "F = ma"
-- [ ] Example: Detected from "give an example" instruction
-- [ ] Note: Detected from "add a note" instruction
-- [ ] Subheading: Detected from "subheading" instruction
-- [ ] Summary: Detected from "summary" instruction
+### ✅ Explicit Positioning
+- [ ] Row 1: Title centered with 3/4 width
+- [ ] Row 3: Three headings in equal thirds (0.0, 0.333, 0.667 positions)
+- [ ] Row 5: Three descriptions aligned under headings
+- [ ] Row 7: Three formulas aligned under descriptions
+- [ ] Row 9: Three example sets aligned under formulas
+- [ ] Row 11: Summary centered with 3/4 width
+- [ ] Row 13: Bullet point on left side
 
-### ✅ Grid Positioning
-- [ ] Title: Centered (columns 3-10)
-- [ ] Heading: Left-aligned with slight indent (columns 2-11)
-- [ ] Definition: Full width (columns 1-12)
-- [ ] Bullet: Indented (columns 2-12)
-- [ ] Numbered: Indented (columns 2-12)
-- [ ] Formula: Centered narrow (columns 4-9)
-- [ ] Example: Slightly indented (columns 2-11)
-- [ ] Note: Right-aligned (columns 8-12)
-- [ ] Subheading: More indented (columns 3-11)
-- [ ] Summary: Full width (columns 1-12)
+### ✅ Width Specifications
+- [ ] 1/3 widths: All three-column items properly sized
+- [ ] 3/4 widths: Title and summary appropriately wide
+- [ ] 1/2 width: Bullet point properly sized
+- [ ] No overlapping content horizontally
+
+### ✅ Positioning Accuracy
+- [ ] 0.0 position: Items at left edge of canvas area
+- [ ] 0.333 position: Items at 1/3 point of canvas
+- [ ] 0.667 position: Items at 2/3 point of canvas
+- [ ] Center position: Items properly centered
+- [ ] Left position: Items at left edge
 
 ### ✅ Styling Application
-- [ ] Title: Extra large, bold, centered
-- [ ] Heading: Large, bold, left-aligned
-- [ ] Definition: Normal, left-aligned
-- [ ] Bullet: Normal with bullet marker
-- [ ] Numbered: Normal with number marker
-- [ ] Formula: Monospace, centered
-- [ ] Example: Normal with highlight
-- [ ] Note: Small, italic
-- [ ] Subheading: Medium, semi-bold
-- [ ] Summary: Medium weight with border
+- [ ] xlarge font: Title prominently displayed
+- [ ] large font: Law headings clearly visible
+- [ ] medium font: Descriptions and formulas readable
+- [ ] small font: Examples appropriately sized
+- [ ] bold weight: Title, headings, and summary emphasized
+- [ ] normal weight: Descriptions and examples standard
 
-### ✅ Educational Flow
-- [ ] Logical sequence: Title → Heading → Definition → Details
-- [ ] Proper spacing between content types
-- [ ] Consistent row progression (no overlaps)
-- [ ] Appropriate content hierarchy
+### ✅ Text Alignment
+- [ ] center align: Title, headings, formulas, summary centered in boxes
+- [ ] left align: Descriptions and examples left-aligned in boxes
+- [ ] Bullet point: Automatically prefixed with "•"
 
 ### ✅ Technical Validation
-- [ ] All coordinates are numbers (not undefined)
-- [ ] Grid positions stored in metadata
-- [ ] Content type metadata present
+- [ ] All coordinates are calculated numbers
+- [ ] Canvas dimensions properly used for calculations
+- [ ] Responsive positioning (adapts to window size)
 - [ ] No console errors during creation
-- [ ] Proper canvas coordinate conversion
+- [ ] Position specs stored in metadata
 
 ---
 
@@ -187,17 +240,21 @@ After completing all tests, verify:
 After all tests, your canvas should look like this:
 
 ```
-Row 1:  [      Newton's Laws of Motion        ] ← Title (centered)
-Row 2:  [                                     ] ← Spacing
-Row 3:  [First Law of Motion                  ] ← Heading (left)
-Row 4:  [An object at rest stays at rest...   ] ← Definition (full width)
-Row 5:  [• Key points about inertia           ] ← Bullet (indented)
-Row 6:  [1. Steps to calculate force          ] ← Numbered (indented)
-Row 7:  [         F = ma                      ] ← Formula (centered)
-Row 8:  [Example of first law in action       ] ← Example (highlighted)
-Row 9:  [                    Historical note  ] ← Note (right-aligned)
-Row 10: [   Applications in Daily Life        ] ← Subheading (indented)
-Row 11: [Summary of Newton's first law...     ] ← Summary (full width)
+Row 1:  [           Newton's Laws of Motion              ] ← Title (center, 3/4 width)
+
+Row 3:  [Newton's First Law] [Newton's Second Law] [Newton's Third Law] ← Headings (1/3 each)
+
+Row 5:  [An object at rest  ] [Acceleration is    ] [For every action  ] ← Descriptions
+        [stays at rest...   ] [proportional to... ] [equal & opposite  ]
+
+Row 7:  [    F = 0 → a = 0  ] [      F = ma       ] [    F₁ = -F₂      ] ← Formulas
+
+Row 9:  [Car braking,       ] [Pushing cart,      ] [Walking, swimming ] ← Examples
+        [objects on table   ] [rocket propulsion  ] [rocket thrust     ]
+
+Row 11: [        Summary: These three laws form the foundation...        ] ← Summary
+
+Row 13: [• Key takeaway: Forces cause acceleration                       ] ← Bullet
 ```
 
 ---
@@ -206,27 +263,28 @@ Row 11: [Summary of Newton's first law...     ] ← Summary (full width)
 
 If any test fails:
 
-1. **Check Console Output**: Look for the shape object in browser/server console
-2. **Verify Content Type**: Check `meta.contentType` in the shape
-3. **Check Grid Position**: Look for `meta.gridPosition` JSON string
-4. **Validate Coordinates**: Ensure x,y are numbers, not undefined
-5. **Review Detection Logic**: Check if instruction keywords triggered correct detection
+1. **Check Position Calculation**: Verify x,y coordinates match expected row/position
+2. **Verify Width Calculation**: Check that width matches fraction of canvas width
+3. **Validate Canvas Dimensions**: Ensure canvas dimensions are sent to AI
+4. **Review Styling**: Check fontSize, fontWeight, textAlign properties
+5. **Check Overlap**: Ensure items in same row don't overlap horizontally
 
 ---
 
 ## Performance Notes
 
-- Each request should be faster than the old coordinate-based system
-- AI context is much smaller (only current row + recent content)
-- No complex spatial calculations needed
-- Grid positioning is deterministic and consistent
+- Each request processes explicit positioning directly
+- No semantic interpretation needed - direct coordinate calculation
+- Canvas dimensions sent once and reused for all calculations
+- Predictable, deterministic positioning
+- Support for complex multi-column layouts
 
 ---
 
 ## Next Steps
 
 Once all tests pass:
-- ✅ Step 2 is fully validated and working
-- 🚀 Ready to proceed with Step 3: Camera Management System
-- 📊 Performance improvements confirmed
-- 🎯 Educational content flow established 
+- ✅ Step 2 is fully validated with explicit positioning
+- 🚀 Ready for advanced layout scenarios
+- 📊 Multi-column educational content confirmed
+- 🎯 Flexible positioning system established 

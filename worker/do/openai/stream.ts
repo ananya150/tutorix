@@ -3,7 +3,6 @@ import { parse } from 'best-effort-json-parser'
 import OpenAI from 'openai'
 import { buildPromptMessages } from './prompt'
 import { ISimpleEvent, RESPONSE_FORMAT, SimpleEvent } from './schema'
-import { GridManager } from '../grid/GridManager'
 
 const OPENAI_MODEL = 'gpt-4o-2024-08-06'
 
@@ -12,12 +11,11 @@ const OPENAI_MODEL = 'gpt-4o-2024-08-06'
  */
 export async function* streamEvents(
 	model: OpenAI,
-	prompt: TLAiSerializedPrompt,
-	gridManager?: GridManager
+	prompt: TLAiSerializedPrompt
 ): AsyncGenerator<ISimpleEvent> {
 	const stream = model.beta.chat.completions.stream({
 		model: OPENAI_MODEL,
-		messages: buildPromptMessages(prompt, gridManager),
+		messages: buildPromptMessages(prompt),
 		response_format: RESPONSE_FORMAT,
 	})
 

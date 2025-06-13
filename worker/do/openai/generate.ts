@@ -2,7 +2,6 @@ import { TLAiSerializedPrompt } from '@tldraw/ai'
 import OpenAI from 'openai'
 import { buildPromptMessages } from './prompt'
 import { IModelResponse, ISimpleEvent, ModelResponse, RESPONSE_FORMAT } from './schema'
-import { GridManager } from '../grid/GridManager'
 
 const OPENAI_MODEL = 'gpt-4o-2024-08-06'
 
@@ -11,12 +10,11 @@ const OPENAI_MODEL = 'gpt-4o-2024-08-06'
  */
 export async function generateEvents(
 	model: OpenAI,
-	prompt: TLAiSerializedPrompt,
-	gridManager?: GridManager
+	prompt: TLAiSerializedPrompt
 ): Promise<ISimpleEvent[]> {
 	const response = await model.chat.completions.create({
 		model: OPENAI_MODEL,
-		messages: buildPromptMessages(prompt, gridManager),
+		messages: buildPromptMessages(prompt),
 		response_format: RESPONSE_FORMAT,
 	})
 

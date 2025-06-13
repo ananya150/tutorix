@@ -25,20 +25,29 @@ export type ISimpleFill = z.infer<typeof SimpleFill>
 
 const SimpleLabel = z.string()
 
-// Removed rectangle, ellipse, cloud, line, and note shapes - we only support text now
+// Text shape with explicit positioning instead of semantic grid
 
 const SimpleTextShape = z.object({
 	type: z.literal('text'),
 	shapeId: z.string(),
 	note: z.string(),
-	// Grid-based positioning instead of coordinates
-	contentType: z.enum(['title', 'heading', 'subheading', 'definition', 'bullet', 'numbered', 'formula', 'note', 'example', 'summary']),
-	targetRow: z.number().optional(), // AI can suggest specific row, otherwise auto-assigned
-	columnSpan: z.array(z.number()).length(2).optional(), // [start, end] columns, otherwise auto from content type
-	// Keep text properties
-	color: SimpleColor.optional(),
-	text: z.string().optional(),
-	textAlign: z.enum(['start', 'middle', 'end']).optional(),
+	// Explicit positioning parameters
+	row: z.number(), // Required: which row to place the text box
+	horizontalPosition: z.union([
+		z.enum(['left', 'center', 'right']), // Named positions
+		z.number().min(0).max(1) // Custom position as fraction (0=left, 1=right)
+	]),
+	width: z.union([
+		z.string(), // Fractions like "1/4", "1/2", percentages like "25%", or pixels like "200px"
+		z.number() // Direct pixel width
+	]),
+	// Text content and styling
+	text: z.string(),
+	textAlign: z.enum(['left', 'center', 'right']).optional().default('left'), // Alignment within the text box
+	fontSize: z.enum(['small', 'medium', 'large', 'xlarge']).optional().default('medium'),
+	fontWeight: z.enum(['normal', 'bold']).optional().default('normal'),
+	color: SimpleColor.optional().default('black'),
+	bullet: z.boolean().optional().default(false), // Whether to add bullet point
 })
 
 export type ISimpleTextShape = z.infer<typeof SimpleTextShape>

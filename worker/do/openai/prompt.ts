@@ -6,15 +6,14 @@ import {
 } from 'openai/resources'
 import { getSimpleContentFromCanvasContent } from './getSimpleContentFromCanvasContent'
 import { OPENAI_SYSTEM_PROMPT } from './system-prompt'
-import { GridManager } from '../grid/GridManager'
-import { getAllContentTypes } from '../grid/ContentTypes'
+import { calculateCanvasDimensions } from '../positioning/CanvasCalculator'
 
 /**
  * Build the messages for the prompt.
  */
-export function buildPromptMessages(prompt: TLAiSerializedPrompt, gridManager?: GridManager) {
+export function buildPromptMessages(prompt: TLAiSerializedPrompt) {
 	const systemPrompt = buildSystemPrompt(prompt)
-	const developerMessage = buildDeveloperMessage(prompt, gridManager)
+	const developerMessage = buildDeveloperMessage(prompt)
 	const userMessage = buildUserMessages(prompt)
 
 	return [systemPrompt, developerMessage, userMessage]
@@ -30,7 +29,7 @@ function buildSystemPrompt(_prompt: TLAiSerializedPrompt) {
 	} as const
 }
 
-function buildDeveloperMessage(prompt: TLAiSerializedPrompt, gridManager?: GridManager) {
+function buildDeveloperMessage(prompt: TLAiSerializedPrompt) {
 	const developerMessage: ChatCompletionDeveloperMessageParam & {
 		content: Array<ChatCompletionContentPart>
 	} = {
@@ -38,45 +37,48 @@ function buildDeveloperMessage(prompt: TLAiSerializedPrompt, gridManager?: GridM
 		content: [],
 	}
 
-	if (gridManager) {
-		// Use simplified grid context instead of full canvas
-		const gridState = gridManager.getCurrentGridState()
-		
+	// Get canvas dimensions from the prompt (sent by client)
+	const canvasDimensions = (prompt as any).canvasDimensions
+	if (canvasDimensions) {
+		// Calculate responsive canvas dimensions
+		const responsiveCanvas = calculateCanvasDimensions(
+			canvasDimensions.width,
+			canvasDimensions.height
+		)
+
 		developerMessage.content.push({
 			type: 'text',
-			text: `Grid Context:
-- Current row: ${gridState.currentRow}
-- Total columns: ${gridState.availableSpace.totalColumns}
-- Row height: ${gridState.availableSpace.rowHeight}px
+			text: `Canvas Layout Information:
+- Window size: ${responsiveCanvas.windowWidth}px × ${responsiveCanvas.windowHeight}px
+- Canvas area: ${responsiveCanvas.canvasWidth}px × ${responsiveCanvas.canvasHeight}px
+- Horizontal padding: ${responsiveCanvas.horizontalPadding}px on each side
+- Top margin: ${responsiveCanvas.topMargin}px
+- Row height: ${responsiveCanvas.rowHeight}px
 
-Recent content (last 3 items):
-${gridState.recentContent.length > 0 
-	? gridState.recentContent.map(item => 
-		`- Row ${item.row}, Cols ${item.columnStart}-${item.columnEnd}: "${item.text}" (${item.contentType})`
-	).join('\n')
-	: '- No recent content (empty canvas)'
-}
+Positioning System:
+- Use explicit row numbers (1, 2, 3, etc.)
+- Horizontal positions: "left", "center", "right", or custom fractions (0.0-1.0)
+- Width specifications: fractions like "1/4", "1/2", percentages like "25%", or pixels like "200px"
+- Text alignment within boxes: "left", "center", "right"
 
-Available content types and their layouts:
-${getAllContentTypes().map(ct => 
-	`- ${ct.type}: ${ct.description} (columns ${ct.layout.columnStart}-${ct.layout.columnEnd})`
-).join('\n')}`
+Current viewport bounds: x: ${prompt.promptBounds.x}, y: ${prompt.promptBounds.y}, width: ${prompt.promptBounds.w}, height: ${prompt.promptBounds.h}`
 		})
 	} else {
-		// Fallback to old system for compatibility
+		// Fallback for compatibility
 		developerMessage.content.push({
 			type: 'text',
-			text: `The user\'s current viewport is: { x: ${prompt.promptBounds.x}, y: ${prompt.promptBounds.y}, width: ${prompt.promptBounds.w}, height: ${prompt.promptBounds.h} }`,
+			text: `The user's current viewport is: { x: ${prompt.promptBounds.x}, y: ${prompt.promptBounds.y}, width: ${prompt.promptBounds.w}, height: ${prompt.promptBounds.h} }`,
 		})
+	}
 
-		if (prompt.canvasContent) {
-			const simplifiedCanvasContent = getSimpleContentFromCanvasContent(prompt.canvasContent)
+	// Add existing shapes context
+	if (prompt.canvasContent) {
+		const simplifiedCanvasContent = getSimpleContentFromCanvasContent(prompt.canvasContent)
 
-			developerMessage.content.push({
-				type: 'text',
-				text: `Here are all of the shapes that are in the user's current viewport:\n\n${JSON.stringify(simplifiedCanvasContent.shapes).replaceAll('\n', ' ')}`,
-			})
-		}
+		developerMessage.content.push({
+			type: 'text',
+			text: `Existing shapes in viewport:\n\n${JSON.stringify(simplifiedCanvasContent.shapes).replaceAll('\n', ' ')}`,
+		})
 	}
 
 	return developerMessage
