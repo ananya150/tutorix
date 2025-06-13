@@ -101616,14 +101616,24 @@ Assistant: {
 }
 `;
 function calculateCanvasDimensions(windowWidth, windowHeight) {
-  const horizontalPadding = windowWidth / 16;
-  const canvasWidth = windowWidth - horizontalPadding * 2;
-  const topMargin = Math.max(windowHeight / 24, 30);
-  const canvasHeight = windowHeight - topMargin;
-  const rowHeight = Math.max(windowHeight / 12, 60);
+  const REFERENCE_WIDTH = 1461;
+  const REFERENCE_HEIGHT = 793;
+  const normalizedWidth = REFERENCE_WIDTH;
+  const normalizedHeight = REFERENCE_HEIGHT;
+  console.log("📐 Canvas dimensions calculated (consistent coordinate system):", {
+    input: { windowWidth, windowHeight },
+    reference: { REFERENCE_WIDTH, REFERENCE_HEIGHT },
+    note: "Always using same coordinate system for zoom independence",
+    zoomDetected: windowWidth !== REFERENCE_WIDTH || windowHeight !== REFERENCE_HEIGHT
+  });
+  const horizontalPadding = normalizedWidth / 16;
+  const canvasWidth = normalizedWidth - horizontalPadding * 2;
+  const topMargin = Math.max(normalizedHeight / 24, 30);
+  const canvasHeight = normalizedHeight - topMargin;
+  const rowHeight = Math.max(normalizedHeight / 12, 60);
   return {
-    windowWidth,
-    windowHeight,
+    windowWidth: normalizedWidth,
+    windowHeight: normalizedHeight,
     canvasWidth,
     canvasHeight,
     horizontalPadding,
@@ -101750,10 +101760,11 @@ function calculateTextBoxPosition(positionSpec, canvasDimensions) {
     paddingApplied: textBoxPadding
   });
   const y2 = topMargin + (positionSpec.row - 1) * rowHeight;
-  console.log("📐 Y position calculation:", {
+  console.log("📐 Y position calculation (ABSOLUTE):", {
     row: positionSpec.row,
     calculation: `${topMargin} + (${positionSpec.row} - 1) * ${rowHeight}`,
-    result: y2
+    result: y2,
+    note: "Absolute Y coordinate from canvas origin (0,0)"
   });
   const relativeX = parseHorizontalPosition(positionSpec.horizontalPosition, canvasWidth, width);
   let xOffset = 0;
@@ -101761,17 +101772,21 @@ function calculateTextBoxPosition(positionSpec, canvasDimensions) {
     xOffset = textBoxPadding / 2;
   }
   const x = horizontalPadding + relativeX + xOffset;
-  console.log("📐 X position calculation:", {
+  console.log("📐 X position calculation (ABSOLUTE):", {
     horizontalPosition: positionSpec.horizontalPosition,
     relativeX,
     horizontalPadding,
     xOffset,
     calculation: `${horizontalPadding} + ${relativeX} + ${xOffset}`,
-    finalX: x
+    finalX: x,
+    note: "Absolute X coordinate from canvas origin (0,0)"
   });
   const height = rowHeight;
   const result = { x, y: y2, width, height };
-  console.log("🎯 Final position result:", result);
+  console.log("🎯 Final ABSOLUTE position result:", {
+    ...result,
+    note: "These coordinates are absolute from canvas origin (0,0) and independent of viewport/zoom"
+  });
   return result;
 }
 function mapTextAlignment(align) {

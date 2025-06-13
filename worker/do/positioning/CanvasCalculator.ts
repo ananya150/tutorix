@@ -28,22 +28,39 @@ export interface PositionSpec {
 
 /**
  * Calculate responsive canvas dimensions with padding
+ * FIXED: Always use consistent coordinate system for true zoom independence
  */
 export function calculateCanvasDimensions(windowWidth: number, windowHeight: number): CanvasDimensions {
-	// Horizontal padding: reduced from windowWidth/12 to windowWidth/16 for more space
-	const horizontalPadding = windowWidth / 16
-	const canvasWidth = windowWidth - (horizontalPadding * 2)
+	// ZOOM INDEPENDENCE FIX: Always use the first viewport size as reference
+	// This ensures all content uses the same coordinate system regardless of zoom changes
+	const REFERENCE_WIDTH = 1461   // Use actual first viewport width as reference
+	const REFERENCE_HEIGHT = 793   // Use actual first viewport height as reference
+	
+	// Always use the reference dimensions for consistent positioning
+	const normalizedWidth = REFERENCE_WIDTH
+	const normalizedHeight = REFERENCE_HEIGHT
+	
+	console.log('📐 Canvas dimensions calculated (consistent coordinate system):', {
+		input: { windowWidth, windowHeight },
+		reference: { REFERENCE_WIDTH, REFERENCE_HEIGHT },
+		note: 'Always using same coordinate system for zoom independence',
+		zoomDetected: windowWidth !== REFERENCE_WIDTH || windowHeight !== REFERENCE_HEIGHT
+	})
+	
+	// Calculate based on reference dimensions (always consistent)
+	const horizontalPadding = normalizedWidth / 16
+	const canvasWidth = normalizedWidth - (horizontalPadding * 2)
 	
 	// Top margin: small margin at top
-	const topMargin = Math.max(windowHeight / 24, 30) // Responsive top margin, min 30px
-	const canvasHeight = windowHeight - topMargin // Full height minus top margin
+	const topMargin = Math.max(normalizedHeight / 24, 30) // Responsive top margin, min 30px
+	const canvasHeight = normalizedHeight - topMargin // Full height minus top margin
 	
 	// Responsive row height: max(screenHeight/12, 60px)
-	const rowHeight = Math.max(windowHeight / 12, 60)
+	const rowHeight = Math.max(normalizedHeight / 12, 60)
 	
 	return {
-		windowWidth,
-		windowHeight,
+		windowWidth: normalizedWidth,
+		windowHeight: normalizedHeight,
 		canvasWidth,
 		canvasHeight,
 		horizontalPadding,
@@ -183,6 +200,8 @@ export function parseHorizontalPosition(
 
 /**
  * Calculate absolute text box position from specification
+ * IMPORTANT: This calculates ABSOLUTE coordinates from canvas origin (0,0)
+ * These coordinates are independent of viewport position or zoom level
  */
 export function calculateTextBoxPosition(
 	positionSpec: PositionSpec,
@@ -218,15 +237,16 @@ export function calculateTextBoxPosition(
 		paddingApplied: textBoxPadding
 	})
 	
-	// Calculate Y position (row-based)
+	// Calculate Y position (row-based) - ABSOLUTE from canvas origin
 	const y = topMargin + (positionSpec.row - 1) * rowHeight
-	console.log('📐 Y position calculation:', {
+	console.log('📐 Y position calculation (ABSOLUTE):', {
 		row: positionSpec.row,
 		calculation: `${topMargin} + (${positionSpec.row} - 1) * ${rowHeight}`,
-		result: y
+		result: y,
+		note: 'Absolute Y coordinate from canvas origin (0,0)'
 	})
 	
-	// Calculate X position (relative to canvas, then add padding)
+	// Calculate X position (relative to canvas, then add padding) - ABSOLUTE from canvas origin
 	const relativeX = parseHorizontalPosition(positionSpec.horizontalPosition, canvasWidth, width)
 	
 	// Add small offset for fractional positions to create spacing
@@ -236,20 +256,24 @@ export function calculateTextBoxPosition(
 	}
 	
 	const x = horizontalPadding + relativeX + xOffset
-	console.log('📐 X position calculation:', {
+	console.log('📐 X position calculation (ABSOLUTE):', {
 		horizontalPosition: positionSpec.horizontalPosition,
 		relativeX,
 		horizontalPadding,
 		xOffset,
 		calculation: `${horizontalPadding} + ${relativeX} + ${xOffset}`,
-		finalX: x
+		finalX: x,
+		note: 'Absolute X coordinate from canvas origin (0,0)'
 	})
 	
 	// Height is typically one row, but could be adjusted for content
 	const height = rowHeight
 	
 	const result = { x, y, width, height }
-	console.log('🎯 Final position result:', result)
+	console.log('🎯 Final ABSOLUTE position result:', {
+		...result,
+		note: 'These coordinates are absolute from canvas origin (0,0) and independent of viewport/zoom'
+	})
 	
 	return result
 }

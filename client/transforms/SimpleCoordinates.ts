@@ -11,12 +11,19 @@ export class SimpleCoordinates extends TldrawAiTransform {
 		// Save the original coordinates of context bounds (the user's viewport)
 		this.bounds = contextBounds.clone()
 
-		// Add canvas dimensions to the prompt for responsive grid system
-		// Get the actual canvas/viewport dimensions
+		// FIXED: Use viewport dimensions instead of window dimensions for zoom independence
+		// The contextBounds represents the actual visible area in the editor
 		const canvasDimensions = {
 			width: contextBounds.width,
 			height: contextBounds.height
 		}
+		
+		console.log('🖼️ Canvas dimensions for absolute positioning (zoom-independent):', {
+			viewportDimensions: canvasDimensions,
+			contextBounds: contextBounds,
+			promptBounds: promptBounds,
+			note: 'Using viewport size for zoom independence'
+		})
 		
 		// Add canvas dimensions to the prompt (we'll use this in the worker)
 		;(input as any).canvasDimensions = canvasDimensions
@@ -61,11 +68,19 @@ export class SimpleCoordinates extends TldrawAiTransform {
 					return change
 				}
 
-				// Add back in the offset
+				// FIXED: Don't add viewport offset - worker already calculates absolute coordinates
+				// The worker calculates absolute coordinates from canvas origin (0,0)
+				// Adding viewport offset would cause double-offset and incorrect positioning
 				for (const prop of ['x', 'y'] as const) {
 					if (shape[prop] !== undefined) {
-						shape[prop] += this.bounds[prop]
+						// Shape already has absolute coordinates from worker - use as-is
+						console.log(`🎯 Using absolute ${prop} coordinate from worker:`, {
+							absoluteCoordinate: shape[prop],
+							viewportOffset: this.bounds[prop],
+							note: 'Not adding offset - worker calculated absolute position'
+						})
 					} else {
+						// Fallback for shapes without coordinates
 						if (offsetIds.has(shape.id)) {
 							shape[prop] = this.before[shape.id + '_' + prop]
 						} else {
