@@ -9,11 +9,17 @@ interface LessonRequest {
 	lessonId: string
 }
 
+interface WhiteboardItem {
+	text: string
+	type: 'title' | 'heading' | 'subheading' | 'definition' | 'bullet' | 'formula' | 'example' | 'note'
+}
+
 interface SubTopic {
 	index: number
 	name: string
 	durationSec: number
 	summary: string
+	whiteboardItems: WhiteboardItem[]
 }
 
 interface LessonPlan {
@@ -61,27 +67,58 @@ export async function generateLesson(request: IRequest, env: Environment) {
 			* index  (integer, starts at 1)
 			* name  (short title ≤ 8 words)
 			* durationSec (30–60)
-			* summary (concise ≤ 25 words, what will be taught)
-				5.	Ensure the sum of durationSec ≈ ${durationMinutes} × 60 ± 15 s.
-				6.	Respond only with valid UTF-8 JSON inside one set of triple back-ticks—no commentary, no markdown.
-				7.	Example format (do not reuse values):
+			* summary (detailed explanation 40-80 words, covering key concepts and teaching points)
+			* whiteboardItems (array of objects with text and type: {text: string, type: "title"|"heading"|"subheading"|"definition"|"bullet"|"formula"|"example"|"note"})
+				5.	Ensure the sum of durationSec ≈ ( ${durationMinutes} × 60 ) ± 15 s.
+				6.	For whiteboardItems, include objects with text and type:
+			* type "title": Main lesson title
+			* type "heading": Section headings
+			* type "subheading": Subsection headings
+			* type "definition": Key term definitions
+			* type "bullet": Important bullet points
+			* type "formula": Mathematical equations or formulas
+			* type "example": Specific examples or case studies
+			* type "note": Additional notes or clarifications
+				7.	Respond only with valid UTF-8 JSON inside one set of triple back-ticks—no commentary, no markdown.
+				8.	Example format (do not reuse values):
 
 			{  
 			"topic": "Sample Topic",  
 			"totalDurationMinutes": 5,  
 			"subtopics": [  
-				{ "index": 1, "name": "Introduction", "durationSec": 45, "summary": "We'll study …"},  
-				{ "index": 2, "name": "Key Concept A", "durationSec": 50, "summary": "Explain …"}  
+				{ 
+					"index": 1, 
+					"name": "Introduction", 
+					"durationSec": 45, 
+					"summary": "We'll study photosynthesis for about 5 minutes, covering the basic process, key components, and importance in ecosystems. This introduction sets the foundation for understanding how plants convert light energy into chemical energy.",
+					"whiteboardItems": [
+						{"text": "Photosynthesis Overview", "type": "title"},
+						{"text": "Light Energy → Chemical Energy", "type": "definition"},
+						{"text": "Key Players: Plants, Sunlight, CO2, Water", "type": "bullet"}
+					]
+				},  
+				{ 
+					"index": 2, 
+					"name": "Light Reactions", 
+					"durationSec": 50, 
+					"summary": "Explain the light-dependent reactions occurring in chloroplasts, focusing on how chlorophyll captures photons and converts them into ATP and NADPH through the electron transport chain.",
+					"whiteboardItems": [
+						{"text": "Light-Dependent Reactions", "type": "heading"},
+						{"text": "Chloroplast Structure", "type": "subheading"},
+						{"text": "6CO2 + 6H2O + light → C6H12O6 + 6O2", "type": "formula"},
+						{"text": "ATP and NADPH Production", "type": "bullet"}
+					]
+				}
 			]  
 			}  
 
-			8.	Begin now.`
+			9.	Begin now.`
 
 		console.log('Calling OpenAI with prompt for topic:', topic)
 		
 		// Call OpenAI o3 model
 		const completion = await openai.chat.completions.create({
-			model: "o3", // Using o3-mini as o3 might not be available yet
+			model: "gpt-4.1", // Using o3-mini as o3 might not be available yet
 			messages: [
 				{ role: "system", content: systemPrompt },
 				{ role: "user", content: userPrompt }
