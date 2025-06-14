@@ -2,7 +2,7 @@ import Vapi from "@vapi-ai/web"
 import { useEffect, useState } from "react"
 
 
-export const VapiWidget = ({lessonData}: {lessonData: any}) => {
+export const VapiWidget = ({lessonData, lessonId}: {lessonData: any, lessonId: string}) => {
 
     const [vapi, setVapi] = useState<Vapi | null>(null);
     const [isConnected, setIsConnected] = useState(false);
@@ -34,7 +34,7 @@ export const VapiWidget = ({lessonData}: {lessonData: any}) => {
       console.log('Starting call');
       if (vapi) {
         console.log('Vapi instance found');
-        vapi.start('9abdc10b-8a05-478f-821a-5bb512ccb35d', {variableValues: {playlist: JSON.stringify(lessonData.lessonPlan)}, firstMessageMode: 'assistant-speaks-first', firstMessage: `Hi there, how are you doing? Should we start the lesson?`});
+        vapi.start('9abdc10b-8a05-478f-821a-5bb512ccb35d', {variableValues: {playlist: JSON.stringify(lessonData.lessonPlan), lessonId: lessonId}, firstMessageMode: 'assistant-speaks-first', firstMessage: `Hi there, how are you doing? Should we start the lesson?`});
       }
     }
 

@@ -7,6 +7,8 @@ import { Input } from '../components/ui/input'
 import { ArrowLeft } from 'lucide-react'
 import Vapi from '@vapi-ai/web'
 import { VapiWidget } from '../components/vapi-widget'
+import { useSSEConnection } from '../hooks/useSSEConnection'
+import { useWhiteboardWebhook } from '../hooks/useWhiteboardWebhook'
 
 interface LessonData {
   id: string
@@ -32,10 +34,56 @@ export function LessonPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-
   // Get lesson ID from query parameters
   const searchParams = new URLSearchParams(location.search)
   const lessonId = searchParams.get('id')
+
+  // Initialize webhook state management
+  const { state: webhookState, handleWebhookCall } = useWhiteboardWebhook()
+
+  // Set up SSE connection for this specific lesson
+  const { state: sseState, isConnected, error: sseError } = useSSEConnection(
+    lessonId || '', 
+    (event) => {
+      console.log('📡 SSE Event received in LessonPage:', event)
+      
+      try {
+        // Handle whiteboard-update events
+        if (event.type === 'whiteboard-update') {
+          console.log('🎯 Processing whiteboard update:', event.data)
+          
+          // Extract subtopic data and trigger webhook processing
+          const { subtopic } = event.data
+          if (subtopic) {
+            // Validate subtopic data before processing
+            if (subtopic.index && subtopic.name && subtopic.summary) {
+              // Ensure whiteboardItems exists and is an array
+              if (!subtopic.whiteboardItems || !Array.isArray(subtopic.whiteboardItems)) {
+                console.warn('⚠️ Missing or invalid whiteboardItems, using empty array')
+                subtopic.whiteboardItems = []
+              }
+              
+              // Ensure durationSec exists
+              if (!subtopic.durationSec) {
+                console.warn('⚠️ Missing durationSec, using default value')
+                subtopic.durationSec = 30
+              }
+              
+              console.log('✅ Validated subtopic data:', subtopic)
+              handleWebhookCall(subtopic)
+            } else {
+              console.error('❌ Invalid subtopic data structure:', subtopic)
+            }
+          } else {
+            console.error('❌ No subtopic data in whiteboard-update event')
+          }
+        }
+      } catch (error) {
+        console.error('❌ Error processing SSE event:', error)
+        console.error('Event data:', event)
+      }
+    }
+  )
 
   console.log('LessonPage rendered with lessonId:', lessonId)
 
@@ -139,7 +187,26 @@ export function LessonPage() {
         </div>
       </div>
 
-      <VapiWidget lessonData={lessonData} />
+      {/* SSE Connection Status */}
+      <div className="absolute top-4 right-4 z-10 bg-white/90 backdrop-blur-sm rounded-lg p-3 shadow-sm">
+        <div className="text-xs space-y-1">
+          <div className="flex items-center gap-2">
+            <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`} />
+            <span>{isConnected ? 'Connected' : 'Disconnected'}</span>
+          </div>
+          {sseError && <div className="text-red-600">SSE Error: {sseError}</div>}
+          {webhookState.isProcessing && (
+            <div className="text-blue-600">Processing: {webhookState.currentSubtopic?.name}</div>
+          )}
+          {sseState.lastEvent && (
+            <div className="text-gray-600">
+              Last: {sseState.lastEvent.type} at {new Date(sseState.lastEvent.timestamp).toLocaleTimeString()}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <VapiWidget lessonId={lessonId!} lessonData={lessonData} />
 
       <Tldraw hideUi onMount={setEditor} />
       {/* {editor && <InputBar editor={editor} />} */}

@@ -42,9 +42,13 @@ Update your Vapi assistant configuration to include a new function:
           }
         },
         "required": ["index", "name", "whiteboardItems"]
+      },
+      "lessonId": {
+        "type": "string",
+        "description": "Lesson ID to identify which lesson page should receive the whiteboard updates"
       }
     },
-    "required": ["subtopic"]
+    "required": ["subtopic", "lessonId"]
   },
   "async": true,
   "webhookUrl": "http://localhost:5173/api/whiteboard-update"
