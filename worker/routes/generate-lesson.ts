@@ -68,17 +68,18 @@ export async function generateLesson(request: IRequest, env: Environment) {
 			* name  (short title ≤ 8 words)
 			* durationSec (30–60)
 			* summary (detailed explanation 40-80 words, covering key concepts and teaching points)
-			* whiteboardItems (array of objects with text and type: {text: string, type: "title"|"heading"|"subheading"|"definition"|"bullet"|"formula"|"example"|"note"})
+			* whiteboardItems (array of detailed objects with text and type that will be displayed on whiteboard during this subtopic: {text: string, type: "title"|"heading"|"subheading"|"definition"|"bullet"|"formula"|"example"|"note"})
 				5.	Ensure the sum of durationSec ≈ ( ${durationMinutes} × 60 ) ± 15 s.
-				6.	For whiteboardItems, include objects with text and type:
-			* type "title": Main lesson title
-			* type "heading": Section headings
-			* type "subheading": Subsection headings
-			* type "definition": Key term definitions
-			* type "bullet": Important bullet points
-			* type "formula": Mathematical equations or formulas
-			* type "example": Specific examples or case studies
-			* type "note": Additional notes or clarifications
+				6.	For whiteboardItems, create detailed content that supports the teaching:
+			* type "title": Main lesson or subtopic titles (clear, descriptive)
+			* type "heading": Section headings that organize content
+			* type "subheading": Subsection headings for detailed breakdown
+			* type "definition": Complete key term definitions with explanations
+			* type "bullet": Detailed bullet points with specific information, not just keywords
+			* type "formula": Complete mathematical equations, formulas, or scientific notation with labels
+			* type "example": Specific, detailed examples with context and explanation
+			* type "note": Important clarifications, warnings, or additional context
+			Make each whiteboardItem comprehensive and educational, not just brief labels
 				7.	Respond only with valid UTF-8 JSON inside one set of triple back-ticks—no commentary, no markdown.
 				8.	Example format (do not reuse values):
 
@@ -92,9 +93,10 @@ export async function generateLesson(request: IRequest, env: Environment) {
 					"durationSec": 45, 
 					"summary": "We'll study photosynthesis for about 5 minutes, covering the basic process, key components, and importance in ecosystems. This introduction sets the foundation for understanding how plants convert light energy into chemical energy.",
 					"whiteboardItems": [
-						{"text": "Photosynthesis Overview", "type": "title"},
-						{"text": "Light Energy → Chemical Energy", "type": "definition"},
-						{"text": "Key Players: Plants, Sunlight, CO2, Water", "type": "bullet"}
+						{"text": "Photosynthesis: Converting Light to Life", "type": "title"},
+						{"text": "Photosynthesis: The biological process where plants convert light energy into chemical energy (glucose) using carbon dioxide and water", "type": "definition"},
+						{"text": "Essential Components: Chloroplasts contain chlorophyll pigments that capture sunlight", "type": "bullet"},
+						{"text": "Raw Materials: Carbon dioxide from air + Water from roots + Sunlight energy", "type": "bullet"}
 					]
 				},  
 				{ 
@@ -103,10 +105,11 @@ export async function generateLesson(request: IRequest, env: Environment) {
 					"durationSec": 50, 
 					"summary": "Explain the light-dependent reactions occurring in chloroplasts, focusing on how chlorophyll captures photons and converts them into ATP and NADPH through the electron transport chain.",
 					"whiteboardItems": [
-						{"text": "Light-Dependent Reactions", "type": "heading"},
-						{"text": "Chloroplast Structure", "type": "subheading"},
-						{"text": "6CO2 + 6H2O + light → C6H12O6 + 6O2", "type": "formula"},
-						{"text": "ATP and NADPH Production", "type": "bullet"}
+						{"text": "Light-Dependent Reactions: The Photo Stage", "type": "heading"},
+						{"text": "Location: Thylakoid Membranes in Chloroplasts", "type": "subheading"},
+						{"text": "Overall Equation: 6CO2 + 6H2O + light energy → C6H12O6 + 6O2 + ATP", "type": "formula"},
+						{"text": "Energy Conversion: Light photons excite electrons in chlorophyll, creating ATP and NADPH", "type": "bullet"},
+						{"text": "Oxygen Release: Water molecules split (photolysis) releasing O2 as a byproduct", "type": "bullet"}
 					]
 				}
 			]  
