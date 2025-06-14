@@ -70,10 +70,8 @@ export function HomePage() {
         
         // Small delay to show success message before navigation
         setTimeout(() => {
-          // Navigate to lesson page with config as state
-          navigate(`/lesson/${lessonId}`, { 
-            state: { config } 
-          });
+          // Navigate to lesson page - data will be fetched from database
+          navigate(`/lesson?id=${lessonId}`);
         }, 1000);
       } else {
         throw new Error(result.error || 'Failed to create lesson');
@@ -113,7 +111,7 @@ export function HomePage() {
               value={config.topic}
               onChange={(e) => setConfig(prev => ({ ...prev, topic: e.target.value }))}
               className="rounded-lg p-4 min-h-[120px] text-sm resize-none focus-visible:ring-0 focus-visible:ring-offset-0" 
-              placeholder="Enter your topic here...')"
+              placeholder="Enter your topic here..."
               autoFocus
               disabled={isLoading}
             />
