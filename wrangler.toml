@@ -1,6 +1,7 @@
 name = "tldraw-ai-example"
 main = "worker/worker.ts"
 compatibility_date = "2024-12-30"
+compatibility_flags = ["nodejs_compat"]
 assets = { not_found_handling = "single-page-application" }
 
 # Set up the durable object used for each tldraw room

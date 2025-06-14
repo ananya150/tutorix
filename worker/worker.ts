@@ -2,6 +2,8 @@ import { ExecutionContext } from '@cloudflare/workers-types'
 import { WorkerEntrypoint } from 'cloudflare:workers'
 import { AutoRouter, cors, error, IRequest } from 'itty-router'
 import { generate } from './routes/generate'
+import { generateLesson } from './routes/generate-lesson'
+import { getLesson } from './routes/get-lesson'
 import { stream } from './routes/stream'
 import { Environment } from './types'
 
@@ -16,6 +18,8 @@ const router = AutoRouter<IRequest, [env: Environment, ctx: ExecutionContext]>({
 	},
 })
 	.post('/generate', generate)
+	.post('/generate-lesson', generateLesson)
+	.get('/lesson/:lessonId', getLesson)
 	.post('/stream', stream)
 
 export default class extends WorkerEntrypoint<Environment> {
