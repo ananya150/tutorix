@@ -5,6 +5,8 @@ import { useTldrawAiExample } from '../useTldrawAiExample'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { ArrowLeft } from 'lucide-react'
+import Vapi from '@vapi-ai/web'
+import { VapiWidget } from '../components/vapi-widget'
 
 interface LessonData {
   id: string
@@ -29,6 +31,7 @@ export function LessonPage() {
   const [lessonData, setLessonData] = useState<LessonData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
 
   // Get lesson ID from query parameters
   const searchParams = new URLSearchParams(location.search)
@@ -75,6 +78,7 @@ export function LessonPage() {
 
     fetchLessonData()
   }, [lessonId, navigate])
+
 
   // Show loading state
   if (isLoading) {
@@ -134,6 +138,8 @@ export function LessonPage() {
           </div>
         </div>
       </div>
+
+      <VapiWidget lessonData={lessonData} />
 
       <Tldraw hideUi onMount={setEditor} />
       {/* {editor && <InputBar editor={editor} />} */}
