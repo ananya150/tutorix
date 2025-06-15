@@ -96,66 +96,75 @@ export function getTldrawAiOptionsWithCameraControl(repositionCamera: boolean = 
 							try {
 								const change = JSON.parse(match[1])
 								
-								// Handle camera events directly (only if repositionCamera is true)
+								// CAMERA REPOSITIONING DISABLED - Skip all camera events
 								if (change.type === 'camera') {
-									console.log('📹 Client received camera change:', change)
-									
-									if (repositionCamera && editor) {
-										// Get current camera position for comparison
-										const currentCamera = editor.getCamera()
-										console.log('📹 Current camera position:', currentCamera)
-										
-										// Get viewport bounds for context
-										const viewportBounds = editor.getViewportPageBounds()
-										console.log('📹 Current viewport bounds:', viewportBounds)
-										
-										// Move the camera to the specified position
-										const newCameraPosition = {
-											x: change.camera.x,
-											y: change.camera.y,
-											z: change.camera.z
-										}
-										
-										console.log('📹 Setting camera to:', newCameraPosition)
-										console.log('📹 Expected viewport after move:', {
-											x: newCameraPosition.x,
-											y: newCameraPosition.y,
-											width: viewportBounds.width,
-											height: viewportBounds.height,
-											bottom: newCameraPosition.y + viewportBounds.height
-										})
-										
-										editor.setCamera(newCameraPosition, { animation: { duration: 500 } }) // Smooth animation
-										
-										// Verify the camera moved
-										setTimeout(() => {
-											const verifyCamera = editor.getCamera()
-											const newViewportBounds = editor.getViewportPageBounds()
-											console.log('📹 Camera position after setCamera:', verifyCamera)
-											console.log('📹 New viewport bounds:', newViewportBounds)
-											console.log('📹 Camera movement delta:', {
-												deltaX: verifyCamera.x - currentCamera.x,
-												deltaY: verifyCamera.y - currentCamera.y,
-												deltaZ: verifyCamera.z - currentCamera.z
-											})
-											console.log('📹 Camera movement success:', {
-												expectedY: newCameraPosition.y,
-												actualY: verifyCamera.y,
-												yDifference: Math.abs(verifyCamera.y - newCameraPosition.y),
-												success: Math.abs(verifyCamera.y - newCameraPosition.y) < 1
-											})
-										}, 600) // Wait for animation to complete
-										
-										console.log('📹 Camera move command sent')
-									} else if (!repositionCamera) {
-										console.log('📹 Camera positioning disabled, ignoring camera event')
-									} else {
-										console.warn('📹 No editor available for camera movement')
-									}
+									console.log('📹 Client received camera change (DISABLED):', change)
+									console.log('📹 Camera positioning disabled, ignoring camera event')
 									
 									// Don't yield camera events to the transform pipeline
 									continue
 								}
+								
+								// OLD CAMERA HANDLING CODE (COMMENTED OUT FOR SIMPLICITY)
+								// if (change.type === 'camera') {
+								//   console.log('📹 Client received camera change:', change)
+								//   
+								//   if (repositionCamera && editor) {
+								//     // Get current camera position for comparison
+								//     const currentCamera = editor.getCamera()
+								//     console.log('📹 Current camera position:', currentCamera)
+								//     
+								//     // Get viewport bounds for context
+								//     const viewportBounds = editor.getViewportPageBounds()
+								//     console.log('📹 Current viewport bounds:', viewportBounds)
+								//     
+								//     // Move the camera to the specified position
+								//     const newCameraPosition = {
+								//       x: change.camera.x,
+								//       y: change.camera.y,
+								//       z: change.camera.z
+								//     }
+								//     
+								//     console.log('📹 Setting camera to:', newCameraPosition)
+								//     console.log('📹 Expected viewport after move:', {
+								//       x: newCameraPosition.x,
+								//       y: newCameraPosition.y,
+								//       width: viewportBounds.width,
+								//       height: viewportBounds.height,
+								//       bottom: newCameraPosition.y + viewportBounds.height
+								//     })
+								//     
+								//     editor.setCamera(newCameraPosition, { animation: { duration: 500 } }) // Smooth animation
+								//     
+								//     // Verify the camera moved
+								//     setTimeout(() => {
+								//       const verifyCamera = editor.getCamera()
+								//       const newViewportBounds = editor.getViewportPageBounds()
+								//       console.log('📹 Camera position after setCamera:', verifyCamera)
+								//       console.log('📹 New viewport bounds:', newViewportBounds)
+								//       console.log('📹 Camera movement delta:', {
+								//         deltaX: verifyCamera.x - currentCamera.x,
+								//         deltaY: verifyCamera.y - currentCamera.y,
+								//         deltaZ: verifyCamera.z - currentCamera.z
+								//       })
+								//       console.log('📹 Camera movement success:', {
+								//         expectedY: newCameraPosition.y,
+								//         actualY: verifyCamera.y,
+								//         yDifference: Math.abs(verifyCamera.y - newCameraPosition.y),
+								//         success: Math.abs(verifyCamera.y - newCameraPosition.y) < 1
+								//       })
+								//     }, 600) // Wait for animation to complete
+								//     
+								//     console.log('📹 Camera move command sent')
+								//   } else if (!repositionCamera) {
+								//     console.log('📹 Camera positioning disabled, ignoring camera event')
+								//   } else {
+								//     console.warn('📹 No editor available for camera movement')
+								//   }
+								//   
+								//   // Don't yield camera events to the transform pipeline
+								//   continue
+								// }
 								
 								// For all other changes, yield them normally
 								yield change as TLAiChange

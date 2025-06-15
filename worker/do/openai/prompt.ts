@@ -23,8 +23,11 @@ export function buildPromptMessages(prompt: TLAiSerializedPrompt) {
  * Build the system prompt.
  */
 function buildSystemPrompt(prompt: TLAiSerializedPrompt) {
+	// CAMERA REPOSITIONING DISABLED - Always set to false for simplicity
+	const repositionCamera = false
+	
 	// Extract repositionCamera parameter (default to true for backward compatibility)
-	const repositionCamera = (prompt as any).repositionCamera ?? true
+	// const repositionCamera = (prompt as any).repositionCamera ?? true
 	
 	return {
 		role: 'system',
@@ -74,15 +77,38 @@ Current viewport bounds: x: ${prompt.promptBounds.x}, y: ${prompt.promptBounds.y
 		})
 	}
 
-	// Add existing shapes context
+	// TEMPORARILY DISABLED: Remove existing shapes context to test clean slate approach
+	// This will make the AI work without knowledge of existing content
+	console.log('🧪 TESTING: Sending EMPTY shapes context to AI (existing content hidden)')
+	
+	developerMessage.content.push({
+		type: 'text',
+		text: `Existing shapes in viewport:\n\n[]`,
+	})
+	
+	// Log what we would have sent for comparison
 	if (prompt.canvasContent) {
 		const simplifiedCanvasContent = getSimpleContentFromCanvasContent(prompt.canvasContent)
-
-		developerMessage.content.push({
-			type: 'text',
-			text: `Existing shapes in viewport:\n\n${JSON.stringify(simplifiedCanvasContent.shapes).replaceAll('\n', ' ')}`,
+		console.log('🔍 HIDDEN from AI - Existing shapes that would normally be sent:', {
+			shapeCount: simplifiedCanvasContent.shapes.length,
+			shapes: simplifiedCanvasContent.shapes.map((s: any) => ({ 
+				id: s.shapeId, 
+				type: s.type, 
+				text: s.text?.substring(0, 30) + '...' 
+			}))
 		})
 	}
+	
+	// OLD CODE (COMMENTED OUT FOR TESTING):
+	// Add existing shapes context
+	// if (prompt.canvasContent) {
+	//   const simplifiedCanvasContent = getSimpleContentFromCanvasContent(prompt.canvasContent)
+	//   
+	//   developerMessage.content.push({
+	//     type: 'text',
+	//     text: `Existing shapes in viewport:\n\n${JSON.stringify(simplifiedCanvasContent.shapes).replaceAll('\n', ' ')}`,
+	//   })
+	// }
 
 	return developerMessage
 }

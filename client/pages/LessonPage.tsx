@@ -8,7 +8,8 @@ import { ArrowLeft } from 'lucide-react'
 import Vapi from '@vapi-ai/web'
 import { VapiWidget } from '../components/vapi-widget'
 import { useSSEConnection } from '../hooks/useSSEConnection'
-import { useWhiteboardWebhook } from '../hooks/useWhiteboardWebhook'
+import { useSimpleWhiteboard } from '../hooks/useSimpleWhiteboard'
+import { SimpleWhiteboardStatus } from '../components/SimpleWhiteboardStatus'
 import { type SubtopicData } from '../contexts/WhiteboardContext'
 import React from 'react'
 
@@ -41,9 +42,8 @@ function LessonPageContent({
   const navigate = useNavigate()
   const [sessionInitialized, setSessionInitialized] = useState(false)
   
-  // Create both camera-enabled and camera-disabled AI instances
+  // Create AI instance with camera control
   const tldrawAiWithCamera = editor ? useTldrawAiExampleWithCameraControl(editor, true) : null
-  const tldrawAiWithoutCamera = editor ? useTldrawAiExampleWithCameraControl(editor, false) : null
   
   // Create concatenated streaming function that uses the actual /stream endpoint
   const concatenatedStreamFunction = React.useCallback(async (concatenatedPrompt: string, repositionCamera: boolean) => {
@@ -89,22 +89,21 @@ function LessonPageContent({
     }
   }, [editor, tldrawAiWithCamera])
   
-  // Get the whiteboard webhook functionality with concatenated streaming
-  const webhook = useWhiteboardWebhook()
+  // Get the simplified whiteboard functionality
+  const whiteboard = useSimpleWhiteboard()
   
   // Initialize session when component mounts
   React.useEffect(() => {
     if (!sessionInitialized && lessonId) {
       console.log('🔧 LessonPage: Initializing whiteboard session...')
-      webhook.initializeSession(
+      whiteboard.initializeSession(
         `lesson-session-${lessonId}`,
-        lessonId,
-        10 // Default max subtopics, will be updated as needed
+        lessonId
       )
       console.log('✅ LessonPage: Whiteboard session initialized for lesson:', lessonId)
       setSessionInitialized(true)
     }
-  }, [webhook, sessionInitialized, lessonId])
+  }, [whiteboard, sessionInitialized, lessonId])
 
   // Set up SSE connection for this specific lesson with AI integration
   const { state: sseState, isConnected, error: sseError } = useSSEConnection(
@@ -159,16 +158,16 @@ function LessonPageContent({
                 }))
               }
               
-              console.log('🚀 LessonPage: Triggering CONCATENATED STREAMING whiteboard processing...')
-              console.log('🎯 Strategy: All prompts concatenated and sent as one streaming request')
+              console.log('🚀 LessonPage: Triggering SIMPLIFIED whiteboard processing...')
+              console.log('🎯 Strategy: Direct processing with synchronous storage')
               
-              // Use the new concatenated streaming method - all prompts in one request
-              await webhook.handleWebhookCallWithConcatenatedStreaming(
+              // Use the simplified processing method
+              await whiteboard.processSubtopic(
                 subtopicData,
                 concatenatedStreamFunction  // Single function that handles the concatenated prompt
               )
               
-              console.log('✅ LessonPage: CONCATENATED STREAMING processing completed for:', subtopic.name)
+              console.log('✅ LessonPage: SIMPLIFIED processing completed for:', subtopic.name)
               
             } else {
               console.error('❌ LessonPage: Invalid subtopic data structure:', subtopic)
@@ -212,26 +211,27 @@ function LessonPageContent({
             <span>{isConnected ? 'Connected' : 'Disconnected'}</span>
           </div>
           {sseError && <div className="text-red-600">SSE Error: {sseError}</div>}
-          {webhook.state.isProcessing && (
+          {/* {whiteboard.getState().isProcessing && (
             <div className="text-blue-600">
-              AI Processing: {webhook.state.currentSubtopic?.name}
+              AI Processing: {whiteboard.getState().currentSubtopic?.name}
             </div>
           )}
           {sseState.lastEvent && (
             <div className="text-gray-600">
               Last: {sseState.lastEvent.type} at {new Date(sseState.lastEvent.timestamp).toLocaleTimeString()}
             </div>
-          )}
-          <div className="text-gray-500">
+          )} */}
+          {/* <div className="text-gray-500">
             Session: {sessionInitialized ? 'Ready' : 'Initializing...'}
           </div>
           <div className="text-gray-500">
             AI: {tldrawAiWithCamera ? 'Ready' : 'Loading...'}
-          </div>
+          </div> */}
         </div>
       </div>
 
       <VapiWidget lessonId={lessonId} lessonData={lessonData} />
+      {/* <SimpleWhiteboardStatus /> */}
     </>
   )
 }

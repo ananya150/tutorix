@@ -237,20 +237,29 @@ Paragraphs: width 1/8 (extremely narrow)
 `
 
 function getWhiteboardAiSystemPrompt(repositionCamera: boolean): string {
-  const cameraInstructions = repositionCamera ? `
-## CAMERA POSITIONING (ENABLED)
-- You MUST include camera positioning for optimal viewing
-- Add camera positioning prompts when content goes beyond visible area
-- Use format: "Position camera to show row [ROW] with proper context"
-- Camera positioning should be the FIRST prompt in your array when needed
-- For early content (rows < 12): Position to show from row 1
-- For later content (rows ≥ 12): Position to show target row with 5 empty rows below
-` : `
+  // CAMERA REPOSITIONING DISABLED - Always use disabled mode for simplicity
+  const cameraInstructions = `
 ## CAMERA POSITIONING (DISABLED)
 - Do NOT include any camera positioning prompts
 - Focus only on content creation prompts
 - The camera will remain in its current position
+- Never generate camera-related prompts
 `
+
+  // const cameraInstructions = repositionCamera ? `
+  // ## CAMERA POSITIONING (ENABLED)
+  // - You MUST include camera positioning for optimal viewing
+  // - Add camera positioning prompts when content goes beyond visible area
+  // - Use format: "Position camera to show row [ROW] with proper context"
+  // - Camera positioning should be the FIRST prompt in your array when needed
+  // - For early content (rows < 12): Position to show from row 1
+  // - For later content (rows ≥ 12): Position to show target row with 5 empty rows below
+  // ` : `
+  // ## CAMERA POSITIONING (DISABLED)
+  // - Do NOT include any camera positioning prompts
+  // - Focus only on content creation prompts
+  // - The camera will remain in its current position
+  // `
 
   return `
 You are a whiteboard AI agent that converts educational content into precise whiteboard positioning prompts.

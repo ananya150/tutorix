@@ -264,35 +264,41 @@ function getTldrawAiChangesFromSimpleCameraEvent(
 	prompt: TLAiSerializedPrompt,
 	event: ISimpleCameraEvent
 ): TLAiCameraChange[] {
-	// Get canvas dimensions from the prompt
-	const canvasDimensions = (prompt as any).canvasDimensions
-	if (!canvasDimensions) {
-		console.error('Canvas dimensions not found in prompt for camera event')
-		return []
-	}
+	// CAMERA REPOSITIONING DISABLED - Always return empty array
+	console.log('📹 Camera event received but DISABLED:', event)
+	console.log('📹 Camera repositioning disabled, returning empty array')
+	return []
 
-	console.log('📹 Processing camera event:', event)
+	// OLD CAMERA PROCESSING CODE (COMMENTED OUT FOR SIMPLICITY)
+	// // Get canvas dimensions from the prompt
+	// const canvasDimensions = (prompt as any).canvasDimensions
+	// if (!canvasDimensions) {
+	//   console.error('Canvas dimensions not found in prompt for camera event')
+	//   return []
+	// }
 
-	// Calculate responsive canvas dimensions
-	const responsiveCanvas = calculateCanvasDimensions(
-		canvasDimensions.width,
-		canvasDimensions.height
-	)
+	// console.log('📹 Processing camera event:', event)
 
-	// Calculate optimal camera position
-	const cameraResult = calculateOptimalCameraPosition(event.targetRow, responsiveCanvas)
+	// // Calculate responsive canvas dimensions
+	// const responsiveCanvas = calculateCanvasDimensions(
+	//   canvasDimensions.width,
+	//   canvasDimensions.height
+	// )
 
-	console.log('📹 Camera change created:', {
-		targetRow: event.targetRow,
-		position: cameraResult.position,
-		visibleRows: cameraResult.visibleRows
-	})
+	// // Calculate optimal camera position
+	// const cameraResult = calculateOptimalCameraPosition(event.targetRow, responsiveCanvas)
 
-	return [{
-		type: 'camera',
-		description: `Move camera to show row ${event.targetRow} with proper context`,
-		camera: cameraResult.position,
-		reasoning: cameraResult.reasoning
-	}]
+	// console.log('📹 Camera change created:', {
+	//   targetRow: event.targetRow,
+	//   position: cameraResult.position,
+	//   visibleRows: cameraResult.visibleRows
+	// })
+
+	// return [{
+	//   type: 'camera',
+	//   description: `Move camera to show row ${event.targetRow} with proper context`,
+	//   camera: cameraResult.position,
+	//   reasoning: cameraResult.reasoning
+	// }]
 }
 

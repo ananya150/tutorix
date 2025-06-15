@@ -26,10 +26,13 @@ export class TldrawAiDurableObject extends DurableObject<Environment> {
 			height: prompt.contextBounds?.h || prompt.promptBounds.h
 		}
 		
-		// Extract repositionCamera parameter (default to true for backward compatibility)
-		const repositionCamera = (prompt as any).repositionCamera ?? true
+		// CAMERA REPOSITIONING DISABLED - Always set to false for simplicity
+		const repositionCamera = false
 		
-		console.log('Enhancing prompt with metadata:', {
+		// Extract repositionCamera parameter (default to true for backward compatibility)
+		// const repositionCamera = (prompt as any).repositionCamera ?? true
+		
+		console.log('Enhancing prompt with metadata (camera disabled):', {
 			canvasDimensions,
 			repositionCamera
 		})

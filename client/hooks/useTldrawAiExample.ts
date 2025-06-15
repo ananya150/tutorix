@@ -3,7 +3,7 @@ import { Editor } from 'tldraw'
 
 const STATIC_TLDRAWAI_OPTIONS = {
 	apiUrl: '/api',
-	maxResponseLength: 4000,
+	maxResponseLength: 8000,
 }
 
 export function useTldrawAiExample(editor?: Editor) {

@@ -430,7 +430,7 @@ Draw a simple house with a door and two windows`
 
 // Send to OpenAI API
 const response = await openai.chat.completions.create({
-  model: "gpt-4o-2024-08-06",
+  model: "gpt-4.1",
   messages: [systemPrompt, developerMessage, userMessage],
   response_format: { type: "json_object" }
 })
