@@ -17,19 +17,28 @@ export class TldrawAiDurableObject extends DurableObject<Environment> {
 	}
 
 	/**
-	 * Add canvas dimensions to the prompt for explicit positioning
+	 * Add canvas dimensions and camera control to the prompt for explicit positioning
 	 */
-	private addCanvasDimensionsToPrompt(prompt: TLAiSerializedPrompt): TLAiSerializedPrompt {
+	private enhancePromptWithMetadata(prompt: TLAiSerializedPrompt): TLAiSerializedPrompt {
 		// Extract canvas dimensions from the prompt bounds
 		const canvasDimensions = {
 			width: prompt.contextBounds?.w || prompt.promptBounds.w,
 			height: prompt.contextBounds?.h || prompt.promptBounds.h
 		}
 		
-		// Add canvas dimensions to the prompt for the AI to use
+		// Extract repositionCamera parameter (default to true for backward compatibility)
+		const repositionCamera = (prompt as any).repositionCamera ?? true
+		
+		console.log('Enhancing prompt with metadata:', {
+			canvasDimensions,
+			repositionCamera
+		})
+		
+		// Add canvas dimensions and camera control to the prompt for the AI to use
 		return {
 			...prompt,
-			canvasDimensions
+			canvasDimensions,
+			repositionCamera
 		} as TLAiSerializedPrompt
 	}
 
@@ -73,8 +82,8 @@ export class TldrawAiDurableObject extends DurableObject<Environment> {
 		const prompt = (await request.json()) as TLAiSerializedPrompt
 
 		try {
-			// Add canvas dimensions to the prompt for explicit positioning
-			const enhancedPrompt = this.addCanvasDimensionsToPrompt(prompt)
+			// Add canvas dimensions and camera control to the prompt for explicit positioning
+			const enhancedPrompt = this.enhancePromptWithMetadata(prompt)
 
 			const response = await this.service.generate(enhancedPrompt)
 
@@ -109,8 +118,8 @@ export class TldrawAiDurableObject extends DurableObject<Environment> {
 			try {
 				const prompt = await request.json()
 
-				// Add canvas dimensions to the prompt for explicit positioning
-				const enhancedPrompt = this.addCanvasDimensionsToPrompt(prompt as TLAiSerializedPrompt)
+				// Add canvas dimensions and camera control to the prompt for explicit positioning
+				const enhancedPrompt = this.enhancePromptWithMetadata(prompt as TLAiSerializedPrompt)
 
 				for await (const change of this.service.stream(enhancedPrompt)) {
 					response.changes.push(change)

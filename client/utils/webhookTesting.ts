@@ -129,7 +129,7 @@ export const testVapiWebhookCall = async (
       body: JSON.stringify(vapiPayload)
     })
     
-    const result = await response.json()
+    const result: any = await response.json()
     
     console.log('Vapi webhook test response status:', response.status)
     console.log('Vapi webhook test result:', result)

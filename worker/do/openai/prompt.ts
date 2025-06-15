@@ -5,7 +5,7 @@ import {
 	ChatCompletionUserMessageParam,
 } from 'openai/resources'
 import { getSimpleContentFromCanvasContent } from './getSimpleContentFromCanvasContent'
-import { OPENAI_SYSTEM_PROMPT } from './system-prompt'
+import { getOpenAiSystemPrompt } from './system-prompt'
 import { calculateCanvasDimensions } from '../positioning/CanvasCalculator'
 
 /**
@@ -22,10 +22,13 @@ export function buildPromptMessages(prompt: TLAiSerializedPrompt) {
 /**
  * Build the system prompt.
  */
-function buildSystemPrompt(_prompt: TLAiSerializedPrompt) {
+function buildSystemPrompt(prompt: TLAiSerializedPrompt) {
+	// Extract repositionCamera parameter (default to true for backward compatibility)
+	const repositionCamera = (prompt as any).repositionCamera ?? true
+	
 	return {
 		role: 'system',
-		content: OPENAI_SYSTEM_PROMPT,
+		content: getOpenAiSystemPrompt(repositionCamera),
 	} as const
 }
 
