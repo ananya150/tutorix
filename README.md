@@ -131,6 +131,8 @@ pnpm dev                   # Terminal 3
 
 ## 🌟 Demo
 
+🎥 **[Watch Tutorix in Action](https://drive.google.com/file/d/1acbvr6EYcpMUn1-qWsnAhf5HtGvWIW7A/view?usp=sharing)** - See how AI tutoring with intelligent whiteboard works!
+
 ### How It Works
 
 1. **Enter a Topic** - Student inputs any subject they want to learn
