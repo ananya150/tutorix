@@ -1,12 +1,11 @@
 {
-	"name": "tldraw-ai-example",
-	"version": "0.0.0",
+	"name": "tutorix",
+	"version": "1.0.0",
 	"private": true,
-	"homepage": "https://tldraw.dev",
 	"license": "MIT",
 	"author": {
-		"name": "tldraw GB Ltd.",
-		"email": "hello@tldraw.com"
+		"name": "ananya150",
+		"email": "akblockchain15@gmail.com"
 	},
 	"type": "module",
 	"scripts": {

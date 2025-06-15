@@ -17,7 +17,7 @@ const HTML_CONTENT = `<!doctype html>
 		<meta charset="UTF-8" />
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>tldraw ai example</title>
+		<title>Tutorix</title>
 		<script type="module">
 			import RefreshRuntime from "/@react-refresh"
 			RefreshRuntime.injectIntoGlobalHook(window)

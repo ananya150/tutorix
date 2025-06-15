@@ -8,6 +8,7 @@ export const VapiWidget = ({lessonData, lessonId}: {lessonData: any, lessonId: s
     const [isConnected, setIsConnected] = useState(false);
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [isLessonEnded, setIsLessonEnded] = useState(false);
 
     console.log(lessonData.depth)
 
@@ -19,7 +20,10 @@ export const VapiWidget = ({lessonData, lessonId}: {lessonData: any, lessonId: s
         setIsConnected(true);
         setLoading(false);
       })
-      vapi.on('call-end',   () => setIsConnected(false))
+      vapi.on('call-end',   () => {
+        setIsConnected(false)
+        setIsLessonEnded(true)
+      })
       vapi.on('message',    m => console.log('LLM msg / func calls', m))
   
       vapi.on('speech-start', () => {
@@ -39,7 +43,7 @@ export const VapiWidget = ({lessonData, lessonId}: {lessonData: any, lessonId: s
       if (vapi) {
         setLoading(true);
         console.log('Vapi instance found');
-        vapi.start('9abdc10b-8a05-478f-821a-5bb512ccb35d', {variableValues: {playlist: JSON.stringify(lessonData.lessonPlan), lessonId: lessonId}, firstMessageMode: 'assistant-speaks-first', firstMessage: `Hi there, how are you doing? Should we start the lesson?`});
+        vapi.start('9abdc10b-8a05-478f-821a-5bb512ccb35d', {variableValues: {playlist: JSON.stringify(lessonData.lessonPlan), lessonId: lessonId}, firstMessageMode: 'assistant-speaks-first', firstMessage: `Hi there, how are you doing? I am your tutor for this session. Let me know when you are ready to start.`});
       }
     }
 
@@ -51,7 +55,7 @@ export const VapiWidget = ({lessonData, lessonId}: {lessonData: any, lessonId: s
 
   return (
     <div>
-      {!isConnected ? (
+      {!isConnected && !isLessonEnded && (
         <button onClick={startCall} className="fixed top-1/2 left-1/2 -translate-x-1/2 w-[150px] items-center justify-center flex -translate-y-1/2 z-10 bg-black backdrop-blur-sm rounded-lg p-3 shadow-sm z-1000">
           <div className="flex items-center gap-3">
             <div>
@@ -72,7 +76,10 @@ export const VapiWidget = ({lessonData, lessonId}: {lessonData: any, lessonId: s
             </div>
           </div>
         </button>
-      ) : (
+      )}
+
+      {
+        isConnected && (
         <div style={{
           background: '#fff',
           borderRadius: '12px',
@@ -121,45 +128,9 @@ export const VapiWidget = ({lessonData, lessonId}: {lessonData: any, lessonId: s
               Stop lesson
             </button>
           </div>
-          
-          {/* <div style={{
-            maxHeight: '200px',
-            overflowY: 'auto',
-            marginBottom: '12px',
-            padding: '8px',
-            background: '#f8f9fa',
-            borderRadius: '8px'
-          }}>
-            {transcript.length === 0 ? (
-              <p style={{ color: '#666', fontSize: '14px', margin: 0 }}>
-                Conversation will appear here...
-              </p>
-            ) : (
-              transcript.map((msg, i) => (
-                <div
-                  key={i}
-                  style={{
-                    marginBottom: '8px',
-                    textAlign: msg.role === 'user' ? 'right' : 'left'
-                  }}
-                >
-                  <span style={{
-                    background: msg.role === 'user' ? '#12A594' : '#333',
-                    color: '#fff',
-                    padding: '8px 12px',
-                    borderRadius: '12px',
-                    display: 'inline-block',
-                    fontSize: '14px',
-                    maxWidth: '80%'
-                  }}>
-                    {msg.text}
-                  </span>
-                </div>
-              ))
-            )}
-          </div> */}
         </div>
-      )}
+        )
+      }
       
       <style>{`
         @keyframes pulse {
