@@ -19,7 +19,7 @@ export function useTldrawAiExample(editor?: Editor) {
  * @param editor - (optional) The editor instance to use. If not provided, the hook will try to use the editor from React context.
  * @param repositionCamera - Whether to include camera positioning in AI responses (default: true)
  */
-export function useTldrawAiExampleWithCameraControl(editor?: Editor, repositionCamera: boolean = true) {
+export function useTldrawAiExampleWithCameraControl(editor?: Editor, repositionCamera: boolean = false) {
 	const options = getTldrawAiOptionsWithCameraControl(repositionCamera)
 	return useTldrawAi({ editor, ...options })
 }
@@ -27,7 +27,7 @@ export function useTldrawAiExampleWithCameraControl(editor?: Editor, repositionC
 /**
  * Get TldrawAi options with configurable camera positioning
  */
-export function getTldrawAiOptionsWithCameraControl(repositionCamera: boolean = true): TldrawAiOptions {
+export function getTldrawAiOptionsWithCameraControl(repositionCamera: boolean = false): TldrawAiOptions {
 	return {
 		// Transforms that will be applied to the prompt before it's
 		// sent and to changes as they're received.

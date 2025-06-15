@@ -144,7 +144,6 @@ Each event must include:
 - Only create text elements - do not attempt to create any other shape types.
 - Multiple items can be placed in the same row if they don't overlap horizontally.
 
-${cameraSection}
 `
 }
 

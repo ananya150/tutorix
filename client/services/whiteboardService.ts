@@ -467,7 +467,7 @@ export class WhiteboardService {
       })
       
       // Step 3: Execute the concatenated prompt via streaming (camera only for first)
-      await streamFunction(concatenatedPrompt, true) // Camera enabled for first prompt in the sequence
+      await streamFunction(concatenatedPrompt, false) // Camera enabled for first prompt in the sequence
       
       // Step 4: Mark all prompts as executed and notify
       for (const promptObj of generatedPrompts) {
@@ -510,29 +510,16 @@ export class WhiteboardService {
       return ''
     }
     
-    const instructions = `You will receive multiple whiteboard creation requests. Please process them in sequence with the following camera behavior:
-
-1. For the FIRST request only: Position the camera optimally to view the content area
-2. For ALL subsequent requests: Do NOT reposition the camera, just create the content
-
-Here are the ${prompts.length} requests to process:
-
-`
+    const instructions = `You will receive multiple whiteboard creation requests. Please process them in sequence.
+      Here are the ${prompts.length} requests to process:
+      `
     
     const numberedPrompts = prompts.map((prompt, index) => {
-      const isFirst = index === 0
-      const cameraInstruction = isFirst 
-        ? '(REPOSITION CAMERA for optimal viewing)' 
-        : '(NO camera repositioning - content only)'
-      
-      return `${index + 1}. ${cameraInstruction}
-${prompt.prompt}
-
-`
+      return `${prompt.prompt}`
     }).join('')
     
     const footer = `
-Please process all ${prompts.length} requests in sequence. Remember: camera positioning only for the first request, then content-only for the rest.`
+Please process all ${prompts.length} requests in sequence.`
     
     return instructions + numberedPrompts + footer
   }

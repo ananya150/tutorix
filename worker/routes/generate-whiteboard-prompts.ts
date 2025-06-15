@@ -238,13 +238,6 @@ Paragraphs: width 1/8 (extremely narrow)
 
 function getWhiteboardAiSystemPrompt(repositionCamera: boolean): string {
   // CAMERA REPOSITIONING DISABLED - Always use disabled mode for simplicity
-  const cameraInstructions = `
-## CAMERA POSITIONING (DISABLED)
-- Do NOT include any camera positioning prompts
-- Focus only on content creation prompts
-- The camera will remain in its current position
-- Never generate camera-related prompts
-`
 
   // const cameraInstructions = repositionCamera ? `
   // ## CAMERA POSITIONING (ENABLED)
@@ -276,7 +269,6 @@ Convert whiteboardItems into proper positioning prompts using the explicit posit
 - Maintain visual hierarchy and spacing
 - Leave appropriate gaps between different content types
 
-${cameraInstructions}
 
 ## OUTPUT FORMAT
 Generate an array of prompt objects, each with:
@@ -314,7 +306,7 @@ export async function generateWhiteboardPrompts(request: IRequest, env: Environm
   console.log('Generate whiteboard prompts')
   
   try {
-    const { subtopicData, previousPrompts, currentRow, sessionId, lessonId, repositionCamera = true } = await request.json() as GeneratePromptsRequest
+    const { subtopicData, previousPrompts, currentRow, sessionId, lessonId, repositionCamera = false } = await request.json() as GeneratePromptsRequest
     console.log('Whiteboard prompts request:', { 
       subtopicIndex: subtopicData.index, 
       subtopicName: subtopicData.name,
@@ -372,7 +364,7 @@ Return ONLY the JSON array, no other text.
         { role: "system", content: getWhiteboardAiSystemPrompt(repositionCamera) },
         { role: "user", content: userPrompt }
       ],
-      max_completion_tokens: 2000,
+      max_completion_tokens: 4000,
       temperature: 0.3 // Lower temperature for more consistent formatting
     })
     

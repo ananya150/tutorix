@@ -53,7 +53,7 @@ export const useSimpleWhiteboard = () => {
         currentRow,
         // Concatenated stream function - receives all prompts combined
         async (concatenatedPrompt: string, repositionCamera: boolean) => {
-          console.log('🎯 SimpleWhiteboard: Executing CONCATENATED prompt (camera disabled):', {
+          console.log('🎯 SimpleWhiteboard: Executing CONCATENATED prompt :', {
             length: concatenatedPrompt.length,
             preview: concatenatedPrompt.substring(0, 200) + '...',
             repositionCamera: false // We force disable camera
