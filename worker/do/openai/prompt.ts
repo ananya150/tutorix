@@ -13,8 +13,14 @@ import { calculateCanvasDimensions } from '../positioning/CanvasCalculator'
  */
 export function buildPromptMessages(prompt: TLAiSerializedPrompt) {
 	const systemPrompt = buildSystemPrompt(prompt)
+	console.log("System message done");
+	console.log(systemPrompt);
 	const developerMessage = buildDeveloperMessage(prompt)
+	console.log("Developer message done");
+	console.log(developerMessage);
 	const userMessage = buildUserMessages(prompt)
+	console.log("User message done");
+	console.log(userMessage);
 
 	return [systemPrompt, developerMessage, userMessage]
 }
