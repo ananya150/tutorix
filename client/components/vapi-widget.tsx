@@ -13,7 +13,7 @@ export const VapiWidget = ({lessonData, lessonId}: {lessonData: any, lessonId: s
     console.log(lessonData.depth)
 
     useEffect(() => {
-      const vapi = new Vapi('85d4dfc9-c98b-48f2-95f5-c4cadda50bff')
+      const vapi = new Vapi(import.meta.env.VITE_VAPI_PUBLIC_KEY)
       setVapi(vapi)
   
       vapi.on('call-start', () => {
@@ -43,7 +43,7 @@ export const VapiWidget = ({lessonData, lessonId}: {lessonData: any, lessonId: s
       if (vapi) {
         setLoading(true);
         console.log('Vapi instance found');
-        vapi.start('9abdc10b-8a05-478f-821a-5bb512ccb35d', {variableValues: {playlist: JSON.stringify(lessonData.lessonPlan), lessonId: lessonId}, firstMessageMode: 'assistant-speaks-first', firstMessage: `Hi there, how are you doing? I am your tutor for this session. Let me know when you are ready to start.`});
+        vapi.start(import.meta.env.VITE_VAPI_ASSISTANT_ID, {variableValues: {playlist: JSON.stringify(lessonData.lessonPlan), lessonId: lessonId}, firstMessageMode: 'assistant-speaks-first', firstMessage: `Hi there, how are you doing? I am your tutor for this session. Let me know when you are ready to start.`});
       }
     }
 

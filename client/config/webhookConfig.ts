@@ -22,7 +22,7 @@ const isProduction = import.meta.env.PROD
 // Configuration based on environment
 const createWebhookConfig = (): WebhookConfig => {
   // Default to local development
-  let baseUrl = 'https://14a7-106-219-70-127.ngrok-free.app'
+  let baseUrl = 'https://f564-106-219-70-127.ngrok-free.app'
   
   // Check for environment variable override
   const envWebhookUrl = import.meta.env.VITE_WEBHOOK_BASE_URL

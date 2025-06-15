@@ -130,22 +130,6 @@ function buildUserMessages(prompt: TLAiSerializedPrompt) {
 		content: [],
 	}
 
-	if (prompt.image) {
-		userMessage.content.push(
-			{
-				type: 'image_url',
-				image_url: {
-					detail: 'auto',
-					url: prompt.image,
-				},
-			},
-			{
-				type: 'text',
-				text: 'Here is a screenshot of the my current viewport.',
-			}
-		)
-	}
-
 	// If it's an array, push each message as a separate message
 	userMessage.content.push({
 		type: 'text',
